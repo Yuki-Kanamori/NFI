@@ -141,3 +141,18 @@ l4 = left_join(site4, l4, by = "site_id") %>% select("site_id", "lat", "lon", "s
 d4 = rbind(s4, m4, l4)
 
 
+
+# 種ごとのデータ数 ----------------------------------------------------------------
+species_n = rbind(d1 %>% select(species, DBH, type),
+                  d2 %>% select(species, DBH, type),
+                  d3 %>% select(species, DBH, type),
+                  d4 %>% select(species, DBH, type)) %>% count(species, type) %>% arrange(-n, species)
+species_n2 = rbind(d1 %>% select(species, DBH, type),
+                  d2 %>% select(species, DBH, type),
+                  d3 %>% select(species, DBH, type),
+                  d4 %>% select(species, DBH, type)) %>% count(species) %>% arrange(-n)
+sugi = species_n %>% filter(species == "スギ")
+hinoki = species_n %>% filter(species == "ヒノキ")
+konara = species_n %>% filter(species == "コナラ")
+hisakaki = species_n %>% filter(species == "ヒサカキ")
+akamatsu = species_n %>% filter(species == "アカマツ")
