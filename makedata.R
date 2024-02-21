@@ -176,4 +176,8 @@ d2_a_sugi = d2_area %>% filter(species == "スギ")
 d3_a_sugi = d3_area %>% filter(species == "スギ")
 d4_a_sugi = d4_area %>% filter(species == "スギ")
 
-a_sugi = left_join(d1_a_sugi, d2_a_sugi, by = c("site_id", "species", "type"))
+a_sugi = left_join(d1_a_sugi, d2_a_sugi, by = c("site_id", "species", "type")) %>% mutate(ratio1 = sum_area.y/sum_area.x)
+a_sugi = left_join(a_sugi, d3_a_sugi, by = c("site_id", "species", "type")) %>% mutate(ratio2 = sum_area/sum_area.y)
+a_sugi = left_join(a_sugi, d4_a_sugi, by = c("site_id", "species", "type")) %>% mutate(ratio3 = sum_area.y.y/sum_area.x.x)
+
+out = a_sugi %>% filter(ratio1 > 3)
