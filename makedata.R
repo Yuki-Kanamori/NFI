@@ -14,27 +14,27 @@ type1 = type1 %>% select("格子点ID", "ＩＤ番号", "林種")
 colnames(type1) = c("site_id", "no_id", "type")
 
 ele1 = read.csv("02_様式２−１.csv", fileEncoding = "CP932")
-ele1 = ele1 %>% select("格子点ID", "標高")
-colnames(ele1) = c("site_id", "elevation")
+ele1 = ele1 %>% select("格子点ID", "標高", "傾斜")
+colnames(ele1) = c("site_id", "elevation", "slope")
 site1 = left_join(site1, ele1, by = "site_id")
 
 s1 = read.csv("04_様式３−小円.csv", fileEncoding = "CP932")
 s1 = s1 %>% select("格子点ＩＤ", "ＩＤ番号", "樹種", "胸高直径")
 colnames(s1) = c("site_id", "no_id","species", "DBH")
 s1 = left_join(site1, s1, by = "site_id") 
-s1 = left_join(s1, type1, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "species", "DBH", "type")
+s1 = left_join(s1, type1, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
 m1 = read.csv("05_様式３−中円.csv", fileEncoding = "CP932")
 m1 = m1 %>% select("格子点ＩＤ", "ＩＤ番号", "樹種", "胸高直径")
 colnames(m1) = c("site_id", "no_id","species", "DBH")
 m1 = left_join(site1, m1, by = "site_id")
-m1 = left_join(m1, type1, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "species", "DBH", "type")
+m1 = left_join(m1, type1, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
 l1 = read.csv("06_様式３−大円.csv", fileEncoding = "CP932")
 l1 = l1 %>% select("格子点ＩＤ", "ＩＤ番号", "樹種", "胸高直径")
 colnames(l1) = c("site_id", "no_id","species", "DBH")
 l1 = left_join(site1, l1, by = "site_id") %>% na.omit()
-l1 = left_join(l1, type1, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "species", "DBH", "type")
+l1 = left_join(l1, type1, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "slope","species", "DBH", "type")
 
 d1 = rbind(s1, m1, l1)
 
@@ -53,27 +53,27 @@ type2 = type2 %>% select("格子点ＩＤ", "ＩＤ番号", "林種")
 colnames(type2) = c("site_id", "no_id", "type")
 
 ele2 = read.csv("02_様式２−１.csv", fileEncoding = "CP932")
-ele2 = ele2 %>% select("格子点ＩＤ", "標高")
-colnames(ele2) = c("site_id", "elevation")
+ele2 = ele2 %>% select("格子点ＩＤ", "標高", "傾斜")
+colnames(ele2) = c("site_id", "elevation", "slope")
 site2 = left_join(site2, ele2, by = "site_id")
 
 s2 = read.csv("04_様式３−小円.csv", fileEncoding = "CP932")
 s2 = s2 %>% select("格子点ＩＤ", "ＩＤ番号", "樹種", "胸高直径")
 colnames(s2) = c("site_id", "no_id","species", "DBH")
 s2 = left_join(site2, s2, by = "site_id")
-s2 = left_join(s2, type2, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "species", "DBH", "type")
+s2 = left_join(s2, type2, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
 m2 = read.csv("05_様式３−中円.csv", fileEncoding = "CP932")
 m2 = m2 %>% select("格子点ＩＤ", "ＩＤ番号", "樹種", "胸高直径")
 colnames(m2) = c("site_id", "no_id","species", "DBH")
 m2 = left_join(site2, m2, by = "site_id")
-m2 = left_join(m2, type2, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "species", "DBH", "type")
+m2 = left_join(m2, type2, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
 l2 = read.csv("06_様式３−大円.csv", fileEncoding = "CP932")
 l2 = l2 %>% select("格子点ＩＤ", "ＩＤ番号", "樹種", "胸高直径")
 colnames(l2) = c("site_id", "no_id","species", "DBH")
 l2 = left_join(site2, l2, by = "site_id")
-l2 = left_join(l2, type2, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "species", "DBH", "type")
+l2 = left_join(l2, type2, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
 d2 = rbind(s2, m2, l2)
 
@@ -156,3 +156,7 @@ hinoki = species_n %>% filter(species == "ヒノキ")
 konara = species_n %>% filter(species == "コナラ")
 hisakaki = species_n %>% filter(species == "ヒサカキ")
 akamatsu = species_n %>% filter(species == "アカマツ")
+
+
+
+# 外れ値のチェック ----------------------------------------------------------------
