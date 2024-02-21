@@ -36,8 +36,8 @@ colnames(l1) = c("site_id", "no_id","species", "DBH")
 l1 = left_join(site1, l1, by = "site_id") %>% na.omit()
 l1 = left_join(l1, type1, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "slope","species", "DBH", "type")
 
-d1 = rbind(s1, m1, l1)
-
+d1 = rbind(s1, m1, l1) %>% mutate(area = (DBH/2)^2*3.14)
+d1_area = d1 %>% group_by(site_id, species, type) %>% summarize(sum_area = sum(area))
 
 
 # time2 -------------------------------------------------------------------
@@ -75,7 +75,8 @@ colnames(l2) = c("site_id", "no_id","species", "DBH")
 l2 = left_join(site2, l2, by = "site_id")
 l2 = left_join(l2, type2, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
-d2 = rbind(s2, m2, l2)
+d2 = rbind(s2, m2, l2) %>% mutate(area = (DBH/2)^2*3.14)
+d2_area = d2 %>% group_by(site_id, species, type) %>% summarize(sum_area = sum(area))
 
 
 # time3 -------------------------------------------------------------------
@@ -111,8 +112,8 @@ l3 = l3 %>% select("格子点ＩＤ", "樹種", "胸高直径")
 colnames(l3) = c("site_id", "species", "DBH")
 l3 = left_join(site3, l3, by = "site_id") %>% select("site_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
-d3 = rbind(s3, m3, l3)
-
+d3 = rbind(s3, m3, l3) %>% mutate(area = (DBH/2)^2*3.14)
+d3_area = d3 %>% group_by(site_id, species, type) %>% summarize(sum_area = sum(area))
 
 
 # time4 -------------------------------------------------------------------
@@ -148,8 +149,8 @@ l4 = l4 %>% select("格子点ＩＤ", "樹種", "胸高直径")
 colnames(l4) = c("site_id", "species", "DBH")
 l4 = left_join(site4, l4, by = "site_id") %>% select("site_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
-d4 = rbind(s4, m4, l4)
-
+d4 = rbind(s4, m4, l4) %>% mutate(area = (DBH/2)^2*3.14)
+d4_area = d4 %>% group_by(site_id, species, type) %>% summarize(sum_area = sum(area))
 
 
 # 種ごとのデータ数 ----------------------------------------------------------------
@@ -170,3 +171,9 @@ akamatsu = species_n %>% filter(species == "アカマツ")
 
 
 # 外れ値のチェック ----------------------------------------------------------------
+d1_a_sugi = d1_area %>% filter(species == "スギ")
+d2_a_sugi = d2_area %>% filter(species == "スギ")
+d3_a_sugi = d3_area %>% filter(species == "スギ")
+d4_a_sugi = d4_area %>% filter(species == "スギ")
+
+a_sugi = left_join(d1_a_sugi, d2_a_sugi, by = c("site_id", "species", "type"))
