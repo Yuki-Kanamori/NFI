@@ -91,20 +91,25 @@ type3 = type3 %>% select("格子点ＩＤ", "標高", "林種")
 colnames(type3) = c("site_id", "elevation", "type")
 site3 = left_join(site3, type3, by = "site_id")
 
+slope3 = read.csv("03_様式２.csv", fileEncoding = "CP932")
+slope3 = slope3 %>% select("格子点ＩＤ", "斜面傾斜")
+colnames(slope3) = c("site_id", "slope")
+site3 = left_join(site3, slope3, by = "site_id")
+
 s3 = read.csv("04_様式３−小円.csv", fileEncoding = "CP932")
 s3 = s3 %>% select("格子点ＩＤ", "樹種", "胸高直径")
 colnames(s3) = c("site_id", "species", "DBH")
-s3 = left_join(site3, s3, by = "site_id") %>% select("site_id", "lat", "lon", "species", "DBH", "type")
+s3 = left_join(site3, s3, by = "site_id") %>% select("site_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
 m3 = read.csv("05_様式３−中円.csv", fileEncoding = "CP932")
 m3 = m3 %>% select("格子点ＩＤ", "樹種", "胸高直径")
 colnames(m3) = c("site_id", "species", "DBH")
-m3 = left_join(site3, m3, by = "site_id") %>% select("site_id", "lat", "lon", "species", "DBH", "type")
+m3 = left_join(site3, m3, by = "site_id") %>% select("site_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
 l3 = read.csv("06_様式３ー大円.csv", fileEncoding = "CP932")
 l3 = l3 %>% select("格子点ＩＤ", "樹種", "胸高直径")
 colnames(l3) = c("site_id", "species", "DBH")
-l3 = left_join(site3, l3, by = "site_id") %>% select("site_id", "lat", "lon", "species", "DBH", "type")
+l3 = left_join(site3, l3, by = "site_id") %>% select("site_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
 d3 = rbind(s3, m3, l3)
 
@@ -123,20 +128,25 @@ type4 = type4 %>% select("格子点ＩＤ", "標高", "林種")
 colnames(type4) = c("site_id", "elevation", "type")
 site4 = left_join(site4, type4, by = "site_id")
 
+slope4 = read.csv("03_様式２.csv", fileEncoding = "CP932")
+slope4 = slope4 %>% select("格子点ＩＤ", "斜面傾斜")
+colnames(slope4) = c("site_id", "slope")
+site4 = left_join(site4, slope4, by = "site_id")
+
 s4 = read.csv("04_様式３−小円.csv", fileEncoding = "CP932")
 s4 = s4 %>% select("格子点ＩＤ", "樹種", "胸高直径")
 colnames(s4) = c("site_id", "species", "DBH")
-s4 = left_join(site4, s4, by = "site_id") %>% select("site_id", "lat", "lon", "species", "DBH", "type")
+s4 = left_join(site4, s4, by = "site_id") %>% select("site_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
 m4 = read.csv("05_様式３−中円.csv", fileEncoding = "CP932")
 m4 = m4 %>% select("格子点ＩＤ", "樹種", "胸高直径")
 colnames(m4) = c("site_id", "species", "DBH")
-m4 = left_join(site4, m4, by = "site_id") %>% select("site_id", "lat", "lon", "species", "DBH", "type")
+m4 = left_join(site4, m4, by = "site_id") %>% select("site_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
 l4 = read.csv("06_様式３−大円.csv", fileEncoding = "CP932")
 l4 = l4 %>% select("格子点ＩＤ", "樹種", "胸高直径")
 colnames(l4) = c("site_id", "species", "DBH")
-l4 = left_join(site4, l4, by = "site_id") %>% select("site_id", "lat", "lon", "species", "DBH", "type")
+l4 = left_join(site4, l4, by = "site_id") %>% select("site_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
 
 d4 = rbind(s4, m4, l4)
 
