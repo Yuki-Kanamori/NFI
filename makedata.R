@@ -29,12 +29,14 @@ m1 = m1 %>% select("格子点ＩＤ", "ＩＤ番号", "樹種", "胸高直径")
 colnames(m1) = c("site_id", "no_id","species", "DBH")
 m1 = left_join(site1, m1, by = "site_id")
 m1 = left_join(m1, type1, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "slope", "species", "DBH", "type")
+summary(m1)
 
 l1 = read.csv("06_様式３−大円.csv", fileEncoding = "CP932")
 l1 = l1 %>% select("格子点ＩＤ", "ＩＤ番号", "樹種", "胸高直径")
 colnames(l1) = c("site_id", "no_id","species", "DBH")
 l1 = left_join(site1, l1, by = "site_id") %>% na.omit()
 l1 = left_join(l1, type1, by = c("site_id", "no_id")) %>% select("site_id", "no_id", "lat", "lon", "elevation", "slope","species", "DBH", "type")
+summary(l1)
 
 d1 = rbind(s1, m1, l1) %>% mutate(area = (DBH/2)^2*3.14)
 d1_area = d1 %>% group_by(site_id, species, type) %>% summarize(sum_area = sum(area))
@@ -180,4 +182,121 @@ a_sugi = left_join(d1_a_sugi, d2_a_sugi, by = c("site_id", "species", "type")) %
 a_sugi = left_join(a_sugi, d3_a_sugi, by = c("site_id", "species", "type")) %>% mutate(ratio2 = sum_area/sum_area.y)
 a_sugi = left_join(a_sugi, d4_a_sugi, by = c("site_id", "species", "type")) %>% mutate(ratio3 = sum_area.y.y/sum_area.x.x)
 
-out = a_sugi %>% filter(ratio1 > 3)
+out1 = a_sugi %>% filter(ratio1 > 3)
+out2 = a_sugi %>% filter(ratio2 > 3)
+out3 = a_sugi %>% filter(ratio3 > 3)
+
+
+
+# スギの個体数データ（天然林） ---------------------------------------------------------------
+# 小円
+sugi_s1_n_n = s1 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
+sugi_s2_n_n = s2 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
+sugi_s3_n_n = s3 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
+sugi_s4_n_n = s4 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
+sugi_s_n_n = left_join(sugi_s1_n_n %>% rename(n1 = n), sugi_s2_n_n %>% rename(n2 = n), by = c("site_id", "type"))
+sugi_s_n_n = left_join(sugi_s_n_n, sugi_s3_n_n %>% rename(n3 = n), by = c("site_id", "type"))
+sugi_s_n_n = left_join(sugi_s_n_n, sugi_s4_n_n %>% rename(n4 = n), by = c("site_id", "type"))
+
+# 中円
+sugi_m1_n_n = m1 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
+sugi_m2_n_n = m2 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
+sugi_m3_n_n = m3 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
+sugi_m4_n_n = m4 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
+sugi_m_n_n = left_join(sugi_m1_n_n %>% rename(n1 = n), sugi_m2_n_n %>% rename(n2 = n), by = c("site_id", "type"))
+sugi_m_n_n = left_join(sugi_m_n_n, sugi_m3_n_n %>% rename(n3 = n), by = c("site_id", "type"))
+sugi_m_n_n = left_join(sugi_m_n_n, sugi_m4_n_n %>% rename(n4 = n), by = c("site_id", "type"))
+
+# 大円
+sugi_l1_n_n = l1 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
+sugi_l2_n_n = l2 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
+sugi_l3_n_n = l3 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
+sugi_l4_n_n = l4 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
+sugi_l_n_n = left_join(sugi_l1_n_n %>% rename(n1 = n), sugi_m2_n_n %>% rename(n2 = n), by = c("site_id", "type"))
+sugi_l_n_n = left_join(sugi_l_n_n, sugi_l3_n_n %>% rename(n3 = n), by = c("site_id", "type"))
+sugi_l_n_n = left_join(sugi_l_n_n, sugi_l4_n_n %>% rename(n4 = n), by = c("site_id", "type"))
+
+
+# スギの個体数データ（人工林） ---------------------------------------------------------------
+# 小円
+sugi_s1_n_a = s1 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
+sugi_s2_n_a = s2 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
+sugi_s3_n_a = s3 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
+sugi_s4_n_a = s4 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
+sugi_s_n_a = left_join(sugi_s1_n_a %>% rename(n1 = n), sugi_s2_n_a %>% rename(n2 = n), by = c("site_id", "type"))
+sugi_s_n_a = left_join(sugi_s_n_a, sugi_s3_n_a %>% rename(n3 = n), by = c("site_id", "type"))
+sugi_s_n_a = left_join(sugi_s_n_a, sugi_s4_n_a %>% rename(n4 = n), by = c("site_id", "type"))
+summary(sugi_s_n_a)
+
+# 中円
+sugi_m1_n_a = m1 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
+sugi_m2_n_a = m2 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
+sugi_m3_n_a = m3 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
+sugi_m4_n_a = m4 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
+sugi_m_n_a = left_join(sugi_m1_n_a %>% rename(n1 = n), sugi_m2_n_a %>% rename(n2 = n), by = c("site_id", "type"))
+sugi_m_n_a = left_join(sugi_m_n_a, sugi_m3_n_a %>% rename(n3 = n), by = c("site_id", "type"))
+sugi_m_n_a = left_join(sugi_m_n_a, sugi_m4_n_a %>% rename(n4 = n), by = c("site_id", "type"))
+summary(sugi_m_n_a)
+
+# 大円
+sugi_l1_n_a = l1 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
+sugi_l2_n_a = l2 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
+sugi_l3_n_a = l3 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
+sugi_l4_n_a = l4 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
+sugi_l_n_a = left_join(sugi_l1_n_a %>% rename(n1 = n), sugi_m2_n_a %>% rename(n2 = n), by = c("site_id", "type"))
+sugi_l_n_a = left_join(sugi_l_n_a, sugi_l3_n_a %>% rename(n3 = n), by = c("site_id", "type"))
+sugi_l_n_a = left_join(sugi_l_n_a, sugi_l4_n_a %>% rename(n4 = n), by = c("site_id", "type"))
+summary(sugi_l_n_a)
+
+
+# スギのDBHデータ（天然林） ---------------------------------------------------------------
+# 小円(> 1cm)
+sugi_s1_d_n = s1 %>% filter(species == "スギ", type == "天然林")
+summary(sugi_s1_d_n)
+hist(sugi_s1_d_n$DBH)
+
+sugi_s2_d_n = s2 %>% filter(species == "スギ", type == "天然林")
+summary(sugi_s2_d_n)
+hist(sugi_s2_d_n$DBH)
+
+sugi_s3_d_n = s3 %>% filter(species == "スギ", type == "天然林")
+summary(sugi_s3_d_n)
+hist(sugi_s3_d_n$DBH)
+
+sugi_s4_d_n = s4 %>% filter(species == "スギ", type == "天然林")
+summary(sugi_s4_d_n)
+hist(sugi_s4_d_n$DBH)
+
+# 中円(> 5cm)
+sugi_m1_d_n = m1 %>% filter(species == "スギ", type == "天然林")
+summary(sugi_m1_d_n) # min = 1.2
+hist(sugi_m1_d_n$DBH)
+
+sugi_m2_d_n = m2 %>% filter(species == "スギ", type == "天然林")
+summary(sugi_m2_d_n) # min = -987がある
+hist(sugi_m2_d_n$DBH)
+
+sugi_m3_d_n = m3 %>% filter(species == "スギ", type == "天然林")
+summary(sugi_m3_d_n) # min = 4.7
+hist(sugi_m3_d_n$DBH)
+
+sugi_m4_d_n = m4 %>% filter(species == "スギ", type == "天然林")
+summary(sugi_m4_d_n) # min = 5
+hist(sugi_m4_d_n$DBH)
+
+# 大円（> 18cm)
+sugi_l1_d_n = l1 %>% filter(species == "スギ", type == "天然林")
+summary(sugi_l1_d_n) # min = 1
+hist(sugi_l1_d_n$DBH)
+
+sugi_l2_d_n = l2 %>% filter(species == "スギ", type == "天然林")
+summary(sugi_l2_d_n) # min = 1.2
+hist(sugi_l2_d_n$DBH)
+
+sugi_l3_d_n = l3 %>% filter(species == "スギ", type == "天然林")
+summary(sugi_l3_d_n) # min = 9.7
+hist(sugi_l3_d_n$DBH)
+
+sugi_l4_d_n = l4 %>% filter(species == "スギ", type == "天然林")
+summary(sugi_l4_d_n)
+hist(sugi_l4_d_n$DBH)
