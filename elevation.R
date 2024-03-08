@@ -65,6 +65,7 @@ length(unique(sp_list3$species2))
 
 
 l_trend = low %>% group_by(time, species2, type) %>% count()
+# %>% group_by(time, type) %>% summarize(mean = mean(n))
 
 g = ggplot(l_trend, aes(x = time, y = n, color = species2, group = species2))
 l = geom_line()
