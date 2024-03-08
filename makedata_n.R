@@ -246,7 +246,7 @@ sugi4 = time4 %>% filter(species == "スギ", type == "天然林") %>% group_by(
 sugi4 = left_join(sugi4, site4 %>% select(-type), by = "site_id") %>% mutate(year = 4)
 head(sugi4)
 
-sugi_n = rbind(sugi1, sugi2, sugi3, sugi4)
+sugi_n = rbind(sugi1, sugi2, sugi3, sugi4) %>% mutate(effort = 0.1)
 
 setwd("/Users/Yuki/Dropbox/NFI")
 write.csv(sugi_n, "sugi_n.csv", fileEncoding = "CP932")
