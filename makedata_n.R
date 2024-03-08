@@ -247,3 +247,6 @@ sugi4 = left_join(sugi4, site4 %>% select(-type), by = "site_id") %>% mutate(yea
 head(sugi4)
 
 sugi_n = rbind(sugi1, sugi2, sugi3, sugi4)
+
+setwd("/Users/Yuki/Dropbox/NFI")
+write.csv(sugi_n, "sugi_n.csv", fileEncoding = "CP932")
