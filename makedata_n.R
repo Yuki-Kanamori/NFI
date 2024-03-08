@@ -229,6 +229,15 @@ time4 = rbind(df_s4, df_m4, df_l4)
 
 
 
+# データの統合 ------------------------------------------------------------------
+head(time1, 3); head(time2, 3); head(time3, 3); head(time4, 3); 
+all = rbind(time1 %>% select(-no_id), time2 %>% select(-no_id), time3, time4)
+
+setwd("/Users/Yuki/Dropbox/NFI")
+write.csv(all, "all.csv", fileEncoding = "CP932")
+
+# read.csv("all.csv", fileEncoding = "CP932")
+
 # スギの個体数（天然林） -------------------------------------------------------------
 sugi1 = time1 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
 sugi1 = left_join(sugi1, site1, by = "site_id") %>% mutate(year = 1)
