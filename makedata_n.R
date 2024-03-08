@@ -249,4 +249,4 @@ head(sugi4)
 sugi_n = rbind(sugi1, sugi2, sugi3, sugi4) %>% mutate(effort = 0.1)
 
 setwd("/Users/Yuki/Dropbox/NFI")
-write.csv(sugi_n, "sugi_n.csv", fileEncoding = "CP932")
+write.csv(sugi_n, "sugi_n.csv", fileEncoding = "CP932", row.names = F)
