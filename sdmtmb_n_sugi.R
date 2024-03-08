@@ -33,7 +33,7 @@ ggplot(pcod_s) +
 
 
 # 空間メッシュの作成 ---------------------------------------------------------------
-mesh <- make_mesh(df, xy_cols = c("lat", "lon"), cutoff = 0.05)
+mesh <- make_mesh(df, xy_cols = c("lat", "lon"), type = "kmeans", seed = 0, cutoff = 0.05, n_knots = 500)
 plot(mesh, pch=1)
 
 
@@ -74,3 +74,18 @@ ggplot(p_s) +
   facet_wrap(~year) + 
   theme_minimal() +
   scale_color_gradient(low = "lightgrey", high = "red")
+
+p_s %>% group_by(year) %>% summarize(mean = mean(est))
+
+
+# 年トレンド -------------------------------------------------------------------
+grid_yrs = replicate_df(grid2, "year", unique(df$year))
+p_st = predict(fit1, newdata = grid_yrs, 
+                return_tmb_object = TRUE)
+
+index = get_index(p_st, bias_correct = T, area = rep(4, nrow(grid_yrs)))
+
+ggplot(index, aes(year, est)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), fill = "grey90") +
+  geom_line(lwd = 1, colour = "grey30") +
+  labs(x = "Year", y = "Biomass (kg)")
