@@ -217,6 +217,7 @@ sugi_l_n_n = left_join(sugi_l_n_n, sugi_l3_n_n %>% rename(n3 = n), by = c("site_
 sugi_l_n_n = left_join(sugi_l_n_n, sugi_l4_n_n %>% rename(n4 = n), by = c("site_id", "type"))
 
 
+
 # スギの個体数データ（人工林） ---------------------------------------------------------------
 # 小円
 sugi_s1_n_a = s1 %>% filter(species == "スギ", type == "人工林") %>% group_by(type, site_id) %>% count()
