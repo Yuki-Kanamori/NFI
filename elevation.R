@@ -72,3 +72,15 @@ l = geom_line()
 f = facet_wrap(~ type, ncol = 3, scales = "free")
 g+l+f+theme_bw() + theme(legend.position = "none")
 
+
+trend = rbind(high %>% group_by(time, species2, type) %>% count() %>% filter(type == "天然林" | type ==  "人工林") %>% group_by(time, type) %>% summarize(mean = mean(n)) %>% mutate(ele = "high"), 
+              low %>% group_by(time, species2, type) %>% count() %>% filter(type == "天然林" | type ==  "人工林") %>% group_by(time, type) %>% summarize(mean = mean(n)) %>% mutate(ele = "low"))
+
+g = ggplot(trend, aes(x = time, y = mean, color = ele, group = ele))
+l = geom_line()
+f = facet_wrap(~ type, ncol = 2)
+g+l+f+theme_bw()
+
+
+
++ theme(legend.position = "none")
