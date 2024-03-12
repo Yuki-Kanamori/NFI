@@ -15,8 +15,8 @@ df = sugi_n_0
 summary(df)
 unique(df$type)
 df = df %>% 
-  filter(type == "天然林") %>%
-  mutate(cpue = n/effort, species = "スギ_天然林") %>% 
+  filter(type == "人工林") %>%
+  mutate(cpue = n/effort) %>% 
   select(year, lat, lon, n, cpue, species, slope, elevation) %>% 
   rename(spp = species)
 summary(df)
@@ -26,7 +26,7 @@ df = df %>% na.omit()
 # データの地図 ------------------------------------------------------------------
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
 ggplot(pcod_s) + 
-  geom_sf(aes(color = n), size = 0.5) +
+  geom_sf(aes(color = n), pch=15,cex=0.5) +
   facet_wrap(~ year) + 
   theme_minimal() +
   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
@@ -88,6 +88,7 @@ grid2[1:2,]
 p = predict(fit2, newdata = grid2, type = "response")
 p[1:3, ]
 p_s = st_as_sf(p, coords=c("lon", "lat"))
+summary(p_s)
 ggplot(p_s) + 
   geom_sf(aes(color = est), pch=15,cex=0.5) +
   facet_wrap(~year) + 
@@ -96,6 +97,18 @@ ggplot(p_s) +
   # scale_color_gradient(low = "lightgrey", high = "red")
 
 p_s %>% group_by(year) %>% summarize(mean = mean(est))
+
+
+
+# 予測値の不確実性の評価 -----------------------------------------------------------------
+p2_sim     <- predict(fit2, newdata = grid2, type="response", nsim=500)
+p_s$est_sd<- apply(p2_sim, 1, sd)
+ggplot(p_s) + 
+  geom_sf(aes(color = est_sd),pch=15,cex=0.5) +
+  facet_wrap(~year) + 
+  theme_minimal() +
+  scale_color_gradient(low = "lightgrey", high = "red")
+
 
 
 # 年トレンド -------------------------------------------------------------------
