@@ -248,7 +248,7 @@ head(sugi1)
 
 sugi2 = time2 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
 sugi2 = left_join(sugi2, site2, by = "site_id") %>% mutate(year = 2)
-head(sugi2)
+ghead(sugi2)
 
 sugi3 = time3 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
 sugi3 = left_join(sugi3, site3 %>% select(-type), by = "site_id") %>% mutate(year = 3)
