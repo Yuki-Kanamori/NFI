@@ -259,7 +259,7 @@ for(i in 1:nrow(splist_t1)){
   
   t2 = left_join(lonlat_t1, t1, by = c("tag", "type")) %>% mutate(year = 1)
   t2$species = paste(splist_t1[i, 1])
-  t2[is.na(t2)] = 0
+  t2 = t2 %>% replace_na(list(n = 0))
   time1_2 = rbind(time1_2, t2)
 }
 
@@ -280,7 +280,7 @@ for(i in 1:nrow(splist_t1)){
   
   t2 = left_join(lonlat_t2, t1, by = c("tag", "type")) %>% mutate(year = 2)
   t2$species = paste(splist_t2[i, 1])
-  t2[is.na(t2)] = 0
+  t2 = t2 %>% replace_na(list(n = 0))
   time2_2 = rbind(time2_2, t2)
 }
 
@@ -302,7 +302,7 @@ for(i in 1:nrow(splist_t1)){
   
   t2 = left_join(lonlat_t1, t1, by = c("tag", "type")) %>% mutate(year = 3)
   t2$species = paste(splist_t3[i, 1])
-  t2[is.na(t2)] = 0
+  t2 = t2 %>% replace_na(list(n = 0))
   time3_2 = rbind(time3_2, t2)
 }
 
