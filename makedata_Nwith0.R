@@ -173,6 +173,8 @@ summary(df_l3)
 # d3_area = d3 %>% group_by(site_id, species, type) %>% summarize(sum_area = sum(area))
 
 time3 = rbind(df_s3, df_m3, df_l3) %>% mutate(tag = paste(lon, lat, sep = "_"))
+head(time3, 3)
+
 
 
 # time4 -------------------------------------------------------------------
@@ -248,13 +250,15 @@ time1_n = left_join(time1_n, site1, by = "site_id") %>% mutate(year = 1, tag = p
 lonlat_t1 = time1 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13865
 
 splist_t1 = time1 %>% select(species) %>% distinct()
+
 time1_2 = NULL
 for(i in 1:nrow(splist_t1)){
-  t1 = time1_n %>% filter(species == i) 
+  sp = splist_t1[i, 1]
+  t1 = time1_n %>% filter(species == sp) 
   t1 = t1[, c("tag", "type", "species", "n")]
   
   t2 = left_join(lonlat_t1, t1, by = c("tag", "type")) %>% mutate(year = 1)
-  t2$species = paste(i)
+  t2$species = paste(splist_t1[i, 1])
   t2[is.na(t2)] = 0
   time1_2 = rbind(time1_2, t2)
 }
@@ -264,16 +268,18 @@ for(i in 1:nrow(splist_t1)){
 time2_n = time2 %>% group_by(type, site_id, species) %>% count()
 time2_n = left_join(time2_n, site2, by = "site_id") %>% mutate(year = 2, tag = paste(lon, lat, sep = "_"))
 
-lonlat_t2 = time2 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13865
+lonlat_t2 = time2 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13940
 
 splist_t2 = time2 %>% select(species) %>% distinct()
+
 time2_2 = NULL
 for(i in 1:nrow(splist_t1)){
-  t1 = time2_n %>% filter(species == i) 
+  sp = splist_t2[i, 1]
+  t1 = time2_n %>% filter(species == sp) 
   t1 = t1[, c("tag", "type", "species", "n")]
   
-  t2 = left_join(lonlat_t1, t1, by = c("tag", "type")) %>% mutate(year = 2)
-  t2$species = paste(i)
+  t2 = left_join(lonlat_t2, t1, by = c("tag", "type")) %>% mutate(year = 2)
+  t2$species = paste(splist_t2[i, 1])
   t2[is.na(t2)] = 0
   time2_2 = rbind(time2_2, t2)
 }
@@ -281,18 +287,21 @@ for(i in 1:nrow(splist_t1)){
 
 # time3
 time3_n = time3 %>% group_by(type, site_id, species) %>% count()
-time3_n = left_join(time3_n, site3, by = "site_id") %>% mutate(year = 3, tag = paste(lon, lat, sep = "_"))
+time3_n = left_join(time3_n, site3 %>% select(-type), by = "site_id") %>% mutate(year = 3, tag = paste(lon, lat, sep = "_"))
+head(time3_n)
 
-lonlat_t3 = time3 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13865
+lonlat_t3 = time3 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13286
 
 splist_t3 = time3 %>% select(species) %>% distinct()
+
 time3_2 = NULL
 for(i in 1:nrow(splist_t1)){
-  t1 = time3_n %>% filter(species == i) 
+  sp = splist_t3[i, 1]
+  t1 = time3_n %>% filter(species == sp) 
   t1 = t1[, c("tag", "type", "species", "n")]
   
   t2 = left_join(lonlat_t1, t1, by = c("tag", "type")) %>% mutate(year = 3)
-  t2$species = paste(i)
+  t2$species = paste(splist_t3[i, 1])
   t2[is.na(t2)] = 0
   time3_2 = rbind(time3_2, t2)
 }
