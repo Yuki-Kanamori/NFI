@@ -13,8 +13,9 @@ library(sp)
 load("sugi_n_0.Rdata")
 df = sugi_n_0
 summary(df)
+unique(df$type)
 df = df %>% 
-  # filter(species == "スギ") %>% 
+  filter(type == "天然林") %>%
   mutate(cpue = n/effort, species = "スギ_天然林") %>% 
   select(year, lat, lon, n, cpue, species, slope, elevation) %>% 
   rename(spp = species)
@@ -25,7 +26,7 @@ df = df %>% na.omit()
 # データの地図 ------------------------------------------------------------------
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
 ggplot(pcod_s) + 
-  geom_sf(aes(color = n)) +
+  geom_sf(aes(color = n), size = 0.5) +
   facet_wrap(~ year) + 
   theme_minimal() +
   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
