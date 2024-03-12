@@ -234,8 +234,8 @@ time4 = rbind(df_s4, df_m4, df_l4) %>% mutate(tag = paste(lon, lat, sep = "_"))
 head(time1, 3); head(time2, 3); head(time3, 3); head(time4, 3); 
 all = rbind(time1 %>% select(-no_id) %>% mutate(time = 1), time2 %>% select(-no_id) %>% mutate(time = 2), time3 %>% mutate(time = 3), time4 %>% mutate(time = 4))
 
-setwd("/Users/Yuki/Dropbox/NFI")
-write.csv(all, "all.csv", fileEncoding = "CP932")
+# setwd("/Users/Yuki/Dropbox/NFI")
+# write.csv(all, "all.csv", fileEncoding = "CP932")
 
 # read.csv("all.csv", fileEncoding = "CP932")
 
