@@ -3,15 +3,15 @@ dirname = "/Users/Yuki/Dropbox/NFI"
 setwd(dir = dirname)
 
 # Packages
-# require(TMB)
-# require(VAST)
 require(tidyverse)
 require(sdmTMB)
 library(sf)
 library(sp)
 
 # read the data
-df = read.csv("sugi_n.csv", fileEncoding = "CP932")
+# df = read.csv("sugi_n.csv", fileEncoding = "CP932")
+load("sugi_n_0.Rdata")
+df = sugi_n_0
 summary(df)
 df = df %>% 
   # filter(species == "スギ") %>% 
@@ -25,11 +25,11 @@ df = df %>% na.omit()
 # データの地図 ------------------------------------------------------------------
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
 ggplot(pcod_s) + 
-  geom_sf(aes(color = cpue)) +
+  geom_sf(aes(color = n)) +
   facet_wrap(~ year) + 
   theme_minimal() +
-  scale_color_gradient(low = "lightgrey", high = "red")
-
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+  # scale_color_gradient(low = "lightgrey", high = "red")
 
 
 # 空間メッシュの作成 ---------------------------------------------------------------
@@ -40,7 +40,7 @@ plot(mesh, pch=1)
 
 # フィッティング -----------------------------------------------------------------
 fit1<- sdmTMB(
-  cpue ~ s(elevation) + as.factor(year),
+  n ~ s(elevation) + as.factor(year),
   data = df,
   mesh = mesh,
   family = poisson(),
@@ -55,6 +55,24 @@ sanity(fit1)
 # ggeffects::ggpredict(fit1, "elevation[0:1500, by = 100]") |> plot()
 
 
+fit2<- sdmTMB(
+  n ~ s(elevation) + as.factor(year),
+  data = df,
+  mesh = mesh,
+  family = poisson(),
+  spatial = "on",
+  time = "year",
+  spatiotemporal = "ar1",
+  reml=FALSE)
+
+fit2
+tidy(fit2, conf.int = TRUE)
+tidy(fit2, effects = "ran_pars", conf.int = TRUE)
+sanity(fit2)
+
+AIC(fit1)
+AIC(fit2)
+
 # 予測 ----------------------------------------------------------------------
 df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
 grid = df2 %>% select(lonlat, lon, lat, elevation) %>% distinct(lonlat, .keep_all = T)
@@ -66,14 +84,15 @@ for(year in unique(df$year)){
 }
 
 grid2[1:2,]
-p = predict(fit1, newdata = grid2, type = "response")
+p = predict(fit2, newdata = grid2, type = "response")
 p[1:3, ]
 p_s = st_as_sf(p, coords=c("lon", "lat"))
 ggplot(p_s) + 
   geom_sf(aes(color = est), pch=15,cex=0.5) +
   facet_wrap(~year) + 
   theme_minimal() +
-  scale_color_gradient(low = "lightgrey", high = "red")
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+  # scale_color_gradient(low = "lightgrey", high = "red")
 
 p_s %>% group_by(year) %>% summarize(mean = mean(est))
 
