@@ -242,34 +242,91 @@ write.csv(all, "all.csv", fileEncoding = "CP932")
 
 # スギの個体数（天然林） -------------------------------------------------------------
 # time1
-sugi1 = time1 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, type) %>% count()
-sugi1 = left_join(sugi1, site1, by = "site_id") %>% mutate(year = 1, tag = paste(lon, lat, sep = "_"))
-head(sugi1)
+time1_n = time1 %>% group_by(type, site_id, species) %>% count()
+time1_n = left_join(time1_n, site1, by = "site_id") %>% mutate(year = 1, tag = paste(lon, lat, sep = "_"))
 
-sugi2 = time2 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
-sugi2 = left_join(sugi2, site2, by = "site_id") %>% mutate(year = 2)
-ghead(sugi2)
+lonlat_t1 = time1 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13865
 
-sugi3 = time3 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
-sugi3 = left_join(sugi3, site3 %>% select(-type), by = "site_id") %>% mutate(year = 3)
-head(sugi3)
+splist_t1 = time1 %>% select(species) %>% distinct() %>% filter(species == "スギ")
 
-sugi4 = time4 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
-sugi4 = left_join(sugi4, site4 %>% select(-type), by = "site_id") %>% mutate(year = 4)
-head(sugi4)
-
-sugi_n = rbind(sugi1, sugi2, sugi3, sugi4) %>% mutate(effort = 0.1)
-
-setwd("/Users/Yuki/Dropbox/NFI")
-write.csv(sugi_n, "sugi_n.csv", fileEncoding = "CP932", row.names = F)
-
-
-
-
-splist_t1 = time1 %>% select(species) %>% distinct()
 time1_2 = NULL
 for(i in 1:nrow(splist_t1)){
-  t1 = time1 %>% filter(species == i)
-  t2 = left_join(lonlat_t1, t1, by = "tag")
+  sp = splist_t1[i, 1]
+  t1 = time1_n %>% filter(species == sp) 
+  t1 = t1[, c("tag", "type", "species", "n")]
+  
+  t2 = left_join(lonlat_t1, t1, by = c("tag", "type")) %>% mutate(year = 1)
+  t2$species = paste(splist_t1[i, 1])
+  t2 = t2 %>% replace_na(list(n = 0))
   time1_2 = rbind(time1_2, t2)
 }
+
+
+# time2
+time2_n = time2 %>% group_by(type, site_id, species) %>% count()
+time2_n = left_join(time2_n, site2, by = "site_id") %>% mutate(year = 2, tag = paste(lon, lat, sep = "_"))
+
+lonlat_t2 = time2 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13940
+
+splist_t2 = time2 %>% select(species) %>% distinct() %>% filter(species == "スギ")
+
+time2_2 = NULL
+for(i in 1:nrow(splist_t1)){
+  sp = splist_t2[i, 1]
+  t1 = time2_n %>% filter(species == sp) 
+  t1 = t1[, c("tag", "type", "species", "n")]
+  
+  t2 = left_join(lonlat_t2, t1, by = c("tag", "type")) %>% mutate(year = 2)
+  t2$species = paste(splist_t2[i, 1])
+  t2 = t2 %>% replace_na(list(n = 0))
+  time2_2 = rbind(time2_2, t2)
+}
+
+
+# time3
+time3_n = time3 %>% group_by(type, site_id, species) %>% count()
+time3_n = left_join(time3_n, site3 %>% select(-type), by = "site_id") %>% mutate(year = 3, tag = paste(lon, lat, sep = "_"))
+head(time3_n)
+
+lonlat_t3 = time3 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13286
+
+splist_t3 = time3 %>% select(species) %>% distinct() %>% filter(species == "スギ")
+
+time3_2 = NULL
+for(i in 1:nrow(splist_t1)){
+  sp = splist_t3[i, 1]
+  t1 = time3_n %>% filter(species == sp) 
+  t1 = t1[, c("tag", "type", "species", "n")]
+  
+  t2 = left_join(lonlat_t1, t1, by = c("tag", "type")) %>% mutate(year = 3)
+  t2$species = paste(splist_t3[i, 1])
+  t2 = t2 %>% replace_na(list(n = 0))
+  time3_2 = rbind(time3_2, t2)
+}
+
+
+# time4
+time4_n = time4 %>% group_by(type, site_id, species) %>% count()
+time4_n = left_join(time4_n, site4 %>% select(-type), by = "site_id") %>% mutate(year = 3, tag = paste(lon, lat, sep = "_"))
+
+lonlat_t4 = time4 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #12648
+
+splist_t4 = time1 %>% select(species) %>% distinct() %>% filter(species == "スギ")
+
+time4_2 = NULL
+for(i in 1:nrow(splist_t1)){
+  sp = splist_t4[i, 1]
+  t1 = time4_n %>% filter(species == sp) 
+  t1 = t1[, c("tag", "type", "species", "n")]
+  
+  t2 = left_join(lonlat_t4, t1, by = c("tag", "type")) %>% mutate(year = 4)
+  t2$species = paste(i)
+  t2 = t2 %>% replace_na(list(n = 0))
+  time4_2 = rbind(time4_2, t2)
+}
+
+
+sugi_n_0 = rbind(time1_2, time2_2, time3_2, time4_2) %>% mutate(effort = 0.1)
+
+setwd("/Users/Yuki/Dropbox/NFI/")
+save(sugi_n_0, file = "sugi_n_0.Rdata")
