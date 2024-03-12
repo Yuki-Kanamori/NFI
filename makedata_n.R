@@ -6,6 +6,7 @@ dir_data1 = "/Users/Yuki/Dropbox/NFI/NFI_1_CSV/第1期"
 setwd(dir_data1)
 
 site1 = read.csv("01_プロット.csv", fileEncoding = "CP932")
+head(site1)
 site1 = site1 %>% select("格子点ID", "世界北緯１", "世界東経１")
 colnames(site1) = c("site_id", "lat", "lon")
 
@@ -56,7 +57,7 @@ summary(df_l1)
 # d1 = rbind(s1, m1, l1) %>% mutate(area = (DBH/2)^2*3.14)
 # d1_area = d1 %>% group_by(site_id, species, type) %>% summarize(sum_area = sum(area))
 
-time1 = rbind(df_s1, df_m1, df_l1)
+time1 = rbind(df_s1, df_m1, df_l1) %>% mutate(tag = paste(lon, lat, sep = "_"))
 
 
 # time2 -------------------------------------------------------------------
@@ -113,7 +114,7 @@ summary(df_l2)
 # d2 = rbind(s2, m2, l2) %>% mutate(area = (DBH/2)^2*3.14)
 # d2_area = d2 %>% group_by(site_id, species, type) %>% summarize(sum_area = sum(area))
 
-time2 = rbind(df_s2, df_m2, df_l2)
+time2 = rbind(df_s2, df_m2, df_l2) %>% mutate(tag = paste(lon, lat, sep = "_"))
 
 
 
@@ -171,7 +172,7 @@ summary(df_l3)
 # d3 = rbind(s3, m3, l3) %>% mutate(area = (DBH/2)^2*3.14)
 # d3_area = d3 %>% group_by(site_id, species, type) %>% summarize(sum_area = sum(area))
 
-time3 = rbind(df_s3, df_m3, df_l3)
+time3 = rbind(df_s3, df_m3, df_l3) %>% mutate(tag = paste(lon, lat, sep = "_"))
 
 
 # time4 -------------------------------------------------------------------
@@ -225,7 +226,7 @@ summary(df_l4)
 # d4 = rbind(s4, m4, l4) %>% mutate(area = (DBH/2)^2*3.14)
 # d4_area = d4 %>% group_by(site_id, species, type) %>% summarize(sum_area = sum(area))
 
-time4 = rbind(df_s4, df_m4, df_l4)
+time4 = rbind(df_s4, df_m4, df_l4) %>% mutate(tag = paste(lon, lat, sep = "_"))
 
 
 
@@ -238,9 +239,11 @@ write.csv(all, "all.csv", fileEncoding = "CP932")
 
 # read.csv("all.csv", fileEncoding = "CP932")
 
+
 # スギの個体数（天然林） -------------------------------------------------------------
-sugi1 = time1 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
-sugi1 = left_join(sugi1, site1, by = "site_id") %>% mutate(year = 1)
+# time1
+sugi1 = time1 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, type) %>% count()
+sugi1 = left_join(sugi1, site1, by = "site_id") %>% mutate(year = 1, tag = paste(lon, lat, sep = "_"))
 head(sugi1)
 
 sugi2 = time2 %>% filter(species == "スギ", type == "天然林") %>% group_by(type, site_id) %>% count()
@@ -259,3 +262,14 @@ sugi_n = rbind(sugi1, sugi2, sugi3, sugi4) %>% mutate(effort = 0.1)
 
 setwd("/Users/Yuki/Dropbox/NFI")
 write.csv(sugi_n, "sugi_n.csv", fileEncoding = "CP932", row.names = F)
+
+
+
+
+splist_t1 = time1 %>% select(species) %>% distinct()
+time1_2 = NULL
+for(i in 1:nrow(splist_t1)){
+  t1 = time1 %>% filter(species == i)
+  t2 = left_join(lonlat_t1, t1, by = "tag")
+  time1_2 = rbind(time1_2, t2)
+}
