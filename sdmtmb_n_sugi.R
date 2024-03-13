@@ -58,7 +58,7 @@ sanity(fit1)
 
 
 fit2<- sdmTMB(
-  n ~ s(elevation) + as.factor(year),
+  n ~ s(elevation) + s(slope) + as.factor(year),
   data = df,
   mesh = mesh,
   family = poisson(),
