@@ -46,6 +46,7 @@ fit1<- sdmTMB(
   mesh = mesh,
   family = poisson(),
   spatial = "on",
+  anisotropy = TRUE,
   reml=FALSE)
 
 fit1
@@ -63,7 +64,8 @@ fit2<- sdmTMB(
   family = poisson(),
   spatial = "on",
   time = "year",
-  spatiotemporal = "ar1",
+  spatiotemporal = "iid",
+  anisotropy = TRUE,
   reml=FALSE)
 
 fit2
