@@ -337,10 +337,11 @@ save(df_time4_0, file = "df_time4_0.Rdata")
 
 
 df_n_0 = rbind(time1_2, time2_2, time3_2, time4_2) %>% mutate(effort = 0.1)
+site_lonlat = rbind(lonlat_t1, lonlat_t2, lonlat_t3, lonlat_t4) %>% distinct(tag, .keep_all = T)
 
 setwd("/Users/Yuki/Dropbox/NFI")
 write_csv(df_n_0, "df_n_0.csv")
 save(df_n_0, file = "df_n_0.Rdata")
-
+write.csv(site_lonlat, "site_lonlat.csv", fileEncoding = "CP932", row.names = F)
 
 
