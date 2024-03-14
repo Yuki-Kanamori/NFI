@@ -15,7 +15,7 @@ df = sugi_n_0
 summary(df)
 unique(df$type)
 df = df %>% 
-  filter(type == "人工林") %>%
+  filter(type == "天然林") %>%
   mutate(cpue = n/effort) %>% 
   select(year, lat, lon, n, cpue, species, slope, elevation) %>% 
   rename(spp = species)
@@ -25,7 +25,7 @@ df = df %>% na.omit()
 
 # データの地図 ------------------------------------------------------------------
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
-ggplot(pcod_s) + 
+ggplot(pcod_s %>% filter(n > 0)) + 
   geom_sf(aes(color = n), pch=15,cex=0.5) +
   facet_wrap(~ year) + 
   theme_minimal() +
@@ -58,7 +58,7 @@ sanity(fit1)
 
 
 fit2<- sdmTMB(
-  n ~ s(elevation) + s(slope) + as.factor(year),
+  n ~ s(elevation) + s(slope) + lat + as.factor(year),
   data = df,
   mesh = mesh,
   family = poisson(),
@@ -91,7 +91,7 @@ p = predict(fit2, newdata = grid2, type = "response")
 p[1:3, ]
 p_s = st_as_sf(p, coords=c("lon", "lat"))
 summary(p_s)
-ggplot(p_s) + 
+ggplot(p_s %>% filter(est > 0)) + 
   geom_sf(aes(color = est), pch=15,cex=0.5) +
   facet_wrap(~year) + 
   theme_minimal() +
