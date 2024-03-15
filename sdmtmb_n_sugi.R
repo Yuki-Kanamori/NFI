@@ -31,7 +31,7 @@ ggplot(pcod_s %>% filter(n > 0)) +
   theme_minimal() +
   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
   # scale_color_gradient(low = "lightgrey", high = "red")
-
+summary(pcod_s %>% filter(n > 0))
 
 # 空間メッシュの作成 ---------------------------------------------------------------
 mesh <- make_mesh(df, xy_cols = c("lat", "lon"), type = "kmeans", seed = 0, cutoff = 0.05, n_knots = 500)
