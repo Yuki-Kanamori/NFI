@@ -249,7 +249,7 @@ time1_n = left_join(time1_n, site1, by = "site_id") %>% mutate(year = 1, tag = p
 
 lonlat_t1 = time1 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13865
 
-splist_t1 = time1 %>% select(species) %>% distinct()
+splist_t1 = time1 %>% select(species) %>% distinct() %>% filter(species == "スギ")
 
 time1_2 = NULL
 for(i in 1:nrow(splist_t1)){
@@ -272,7 +272,7 @@ time2_n = left_join(time2_n, site2, by = "site_id") %>% mutate(year = 2, tag = p
 
 lonlat_t2 = time2 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13940
 
-splist_t2 = time2 %>% select(species) %>% distinct()
+splist_t2 = time2 %>% select(species) %>% distinct() %>% filter(species == "スギ")
 
 time2_2 = NULL
 for(i in 1:nrow(splist_t1)){
@@ -296,7 +296,7 @@ head(time3_n)
 
 lonlat_t3 = time3 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13286
 
-splist_t3 = time3 %>% select(species) %>% distinct()
+splist_t3 = time3 %>% select(species) %>% distinct() %>% filter(species == "スギ")
 
 time3_2 = NULL
 for(i in 1:nrow(splist_t1)){
@@ -319,7 +319,7 @@ time4_n = left_join(time4_n, site4 %>% select(-type), by = "site_id") %>% mutate
 
 lonlat_t4 = time4 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #12648
 
-splist_t4 = time1 %>% select(species) %>% distinct()
+splist_t4 = time1 %>% select(species) %>% distinct() %>% filter(species == "スギ")
 
 time4_2 = NULL
 for(i in 1:nrow(splist_t1)){
@@ -328,10 +328,11 @@ for(i in 1:nrow(splist_t1)){
   t1 = t1[, c("tag", "type", "species", "n")]
   
   t2 = left_join(lonlat_t4, t1, by = c("tag", "type")) %>% mutate(year = 4)
-  t2$species = paste(i)
+  t2$species = paste(splist_t4[i, 1])
   t2 = t2 %>% replace_na(list(n = 0))
   time4_2 = rbind(time4_2, t2)
 }
+unique(time4_2$species)
 df_time4_0 = time4_2
 save(df_time4_0, file = "df_time4_0.Rdata")
 
@@ -344,4 +345,6 @@ write_csv(df_n_0, "df_n_0.csv")
 save(df_n_0, file = "df_n_0.Rdata")
 write.csv(site_lonlat, "site_lonlat.csv", fileEncoding = "CP932", row.names = F)
 
-
+sugi_n_0 = df_n_0
+unique(sugi_n_0$species)
+save(sugi_n_0, file = "sugi_n_0.Rdata")

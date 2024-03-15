@@ -10,28 +10,42 @@ library(sp)
 
 # read the data
 # df = read.csv("sugi_n.csv", fileEncoding = "CP932")
-load("sugi_n_0.Rdata")
-df = sugi_n_0
+# load("sugi_n_0.Rdata")
+load("df_sugi_natural.Rdata")
+df = df_sugi
 summary(df)
-unique(df$type)
+
 df = df %>% 
-  filter(type == "天然林") %>%
-  mutate(cpue = n/effort) %>% 
-  select(year, lat, lon, n, cpue, species, slope, elevation) %>% 
-  rename(spp = species)
+  filter(spp == "スギ") %>%
+  # mutate(cpue = n/effort) %>% 
+  # select(year, lat, lon, n, cpue, species, slope, elevation) %>% 
+  # rename(spp = species)
+  filter(area_n == "n")
 summary(df)
 
 df = df %>% na.omit()
 
+library(ggbeeswarm)
+ggplot(df %>% filter(obs > 0), aes(x = spp, y = obs))+
+  geom_violin(trim = FALSE)+
+  geom_beeswarm(aes(color = spp),
+                size = 2,
+                cex = 2,
+                alpha = .8)+
+  theme_classic() 
+hist(df$obs, breaks=seq(0, 180, 5))
+
+
 # データの地図 ------------------------------------------------------------------
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
-ggplot(pcod_s %>% filter(n > 0)) + 
-  geom_sf(aes(color = n), pch=15,cex=0.5) +
+ggplot(pcod_s %>% filter(obs > 0)) + 
+  geom_sf(aes(color = obs), pch=15,cex=0.5) +
   facet_wrap(~ year) + 
   theme_minimal() +
   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
   # scale_color_gradient(low = "lightgrey", high = "red")
-summary(pcod_s %>% filter(n > 0))
+summary(pcod_s %>% filter(obs > 0))
+
 
 # 空間メッシュの作成 ---------------------------------------------------------------
 mesh <- make_mesh(df, xy_cols = c("lat", "lon"), type = "kmeans", seed = 0, cutoff = 0.05, n_knots = 500)
@@ -58,7 +72,7 @@ sanity(fit1)
 
 
 fit2<- sdmTMB(
-  n ~ s(elevation) + s(slope) + lat + as.factor(year),
+  obs ~ s(elevation) + s(slope) + lat + as.factor(year),
   data = df,
   mesh = mesh,
   family = poisson(),
@@ -78,11 +92,11 @@ AIC(fit2)
 
 # 予測 ----------------------------------------------------------------------
 df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
-grid = df2 %>% select(lonlat, lon, lat, elevation) %>% distinct(lonlat, .keep_all = T)
+grid = df2 %>% select(lonlat, lon, lat, elevation, slope) %>% distinct(lonlat, .keep_all = T)
 
 grid2 = NULL
 for(year in unique(df$year)){
-  grid_sub = data.frame(year, grid[, 2:4])
+  grid_sub = data.frame(year, grid[, c("lon", "lat", "elevation", "slope")])
   grid2 = rbind(grid2, grid_sub)
 }
 
@@ -91,7 +105,7 @@ p = predict(fit2, newdata = grid2, type = "response")
 p[1:3, ]
 p_s = st_as_sf(p, coords=c("lon", "lat"))
 summary(p_s)
-ggplot(p_s %>% filter(est > 0)) + 
+ggplot(p_s %>% filter(est >= 1)) + 
   geom_sf(aes(color = est), pch=15,cex=0.5) +
   facet_wrap(~year) + 
   theme_minimal() +
