@@ -15,7 +15,7 @@ summary(df)
 unique(df$type)
 df = df %>% 
   filter(type == "天然林") %>%
-  mutate(cpue = sum_area/effort) %>% 
+  mutate(cpue = sum_area/effort, tag = paste(lon, lat, sep = "_")) %>% 
   select(year, lat, lon, sum_area, cpue, species, slope, elevation) %>% 
   rename(spp = species)
 summary(df)
@@ -28,7 +28,7 @@ summary(df)
 unique(df$type)
 df = df %>% 
   filter(type == "天然林") %>%
-  mutate(cpue = n/effort) %>% 
+  mutate(cpue = n/effort, tag = paste(lon, lat, sep = "_")) %>% 
   select(year, lat, lon, n, cpue, species, slope, elevation) %>% 
   rename(spp = species)
 summary(df)
