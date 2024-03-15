@@ -116,6 +116,28 @@ rate2 = rate %>% filter(check != -300) %>% mutate(time1to2_a = if_else(time1to2_
 setwd(dir)
 write.csv(rate2, "rate_sugi_nat.csv", fileEncoding = "CP932", row.names = F)
 
+
+# 木の数が減ってるのに面積が増えているもの
 check1 = rate2 %>% filter(time1to2_n < 1) %>% filter(time1to2_a >= 2.5)
 check2 = rate2 %>% filter(time2to3_n < 1) %>% filter(time2to3_a >= 2.5)
 check3 = rate2 %>% filter(time3to4_n < 1) %>% filter(time3to4_a >= 2.5)
+
+setwd(dir)
+write.csv(check1, "Nneg_time1to2.csv", fileEncoding = "CP932", row.names = F)
+write.csv(check2, "Nneg_time2to3.csv", fileEncoding = "CP932", row.names = F)
+write.csv(check3, "Nneg_time3to4.csv", fileEncoding = "CP932", row.names = F)
+
+plot(x = rate2$time1to2_n, rate2$time1to2_a)
+plot(x = rate2$time2to3_n, rate2$time2to3_a)
+plot(x = rate2$time3to4_n, rate2$time3to4_a)
+
+
+# 木の数が増えてるのに面積が減っているもの
+check1 = rate2 %>% filter(time1to2_n >= 1) %>% filter(time1to2_a < 0.8)
+check2 = rate2 %>% filter(time2to3_n >= 1) %>% filter(time2to3_a < 0.8)
+check3 = rate2 %>% filter(time3to4_n >= 1) %>% filter(time3to4_a < 0.8)
+
+setwd(dir)
+write.csv(check1, "Npos_time1to2.csv", fileEncoding = "CP932", row.names = F)
+write.csv(check2, "Npos_time2to3.csv", fileEncoding = "CP932", row.names = F)
+write.csv(check3, "Npos_time3to4.csv", fileEncoding = "CP932", row.names = F)
