@@ -1,6 +1,6 @@
 
 # package -----------------------------------------------------------------
-require(didyverse)
+require(tidyverse)
 
 
 # directory ---------------------------------------------------------------
@@ -327,3 +327,4 @@ df_sugi = rbind(df_t1 %>% select(tag, lon, lat, year, obs, cpue, spp, slope, ele
                 df_t3 %>% select(tag, lon, lat, year, obs, cpue, spp, slope, elevation, area_n),
                 df_t4 %>% select(tag, lon, lat, year, obs, cpue, spp, slope, elevation, area_n))
 save(df_sugi, file = "df_sugi_natural.Rdata")
+
