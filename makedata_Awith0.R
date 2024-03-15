@@ -300,7 +300,7 @@ head(time3_a)
 
 lonlat_t3 = time3 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13286
 
-splist_t3 = time3 %>% select(species) %>% distinct()
+splist_t3 = time3 %>% select(species) %>% distinct() %>% filter(species == "スギ")
 
 time3_2 = NULL
 for(i in 1:nrow(splist_t1)){
@@ -324,7 +324,7 @@ time4_a = left_join(time4_a, site4 %>% select(-type), by = "site_id") %>% mutate
 
 lonlat_t4 = time4 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #12648
 
-splist_t4 = time1 %>% select(species) %>% distinct()
+splist_t4 = time1 %>% select(species) %>% distinct() %>% filter(species == "スギ")
 
 time4_2 = NULL
 for(i in 1:nrow(splist_t1)){
