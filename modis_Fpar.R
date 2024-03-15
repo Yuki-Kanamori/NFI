@@ -7,6 +7,10 @@ setwd(dir)
 site_lonlat = read.csv("site_lonlat.csv", fileEncoding = "CP932")
 site_lonlat2 = site_lonlat %>% select(lon, lat, tag) %>% rename(site_name = tag)
 
+# MOD11A2 lst
+# MOD10A2 snowcover
+# MCD15A2H
+
 modis_Fpar_t1 = mt_batch_subset(df = site_lonlat2,
                            product = "MCD15A2H",
                            band = "Fpar_500m",
