@@ -251,7 +251,7 @@ time1_a = left_join(time1_a, site1, by = "site_id") %>% mutate(year = 1, tag = p
 
 lonlat_t1 = time1 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13865
 
-splist_t1 = time1 %>% select(species) %>% distinct() %>% filter(species == "スギ")
+splist_t1 = time1 %>% select(species) %>% distinct()
 
 time1_2 = NULL
 for(i in 1:nrow(splist_t1)){
@@ -264,8 +264,9 @@ for(i in 1:nrow(splist_t1)){
   t2 = t2 %>% replace_na(list(sum_area = 0))
   time1_2 = rbind(time1_2, t2)
 }
-df_time1_0 = time1_2
-save(df_time1_0, file = "df_time1_0.Rdata")
+df_a_time1_0 = time1_2
+setwd("/Users/Yuki/Dropbox/NFI")
+save(df_a_time1_0, file = "df_a_time1_0.Rdata")
 
 
 # time2
@@ -275,7 +276,7 @@ time2_a = left_join(time2_a, site2, by = "site_id") %>% mutate(year = 2, tag = p
 
 lonlat_t2 = time2 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13940
 
-splist_t2 = time2 %>% select(species) %>% distinct() %>% filter(species == "スギ")
+splist_t2 = time2 %>% select(species) %>% distinct()
 
 time2_2 = NULL
 for(i in 1:nrow(splist_t1)){
@@ -288,8 +289,9 @@ for(i in 1:nrow(splist_t1)){
   t2 = t2 %>% replace_na(list(sum_area = 0))
   time2_2 = rbind(time2_2, t2)
 }
-df_time2_0 = time2_2
-save(df_time2_0, file = "df_time2_0.Rdata")
+df_a_time2_0 = time2_2
+setwd("/Users/Yuki/Dropbox/NFI")
+save(df_a_time2_0, file = "df_a_time2_0.Rdata")
 
 
 # time3
@@ -300,7 +302,7 @@ head(time3_a)
 
 lonlat_t3 = time3 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13286
 
-splist_t3 = time3 %>% select(species) %>% distinct() %>% filter(species == "スギ")
+splist_t3 = time3 %>% select(species) %>% distinct()
 
 time3_2 = NULL
 for(i in 1:nrow(splist_t1)){
@@ -313,8 +315,9 @@ for(i in 1:nrow(splist_t1)){
   t2 = t2 %>% replace_na(list(sum_area = 0))
   time3_2 = rbind(time3_2, t2)
 }
-df_time3_0 = time3_2
-save(df_time3_0, file = "df_time3_0.Rdata")
+df_a_time3_0 = time3_2
+setwd("/Users/Yuki/Dropbox/NFI")
+save(df_a_time3_0, file = "df_a_time3_0.Rdata")
 
 
 # time4
@@ -324,7 +327,7 @@ time4_a = left_join(time4_a, site4 %>% select(-type), by = "site_id") %>% mutate
 
 lonlat_t4 = time4 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #12648
 
-splist_t4 = time1 %>% select(species) %>% distinct() %>% filter(species == "スギ")
+splist_t4 = time1 %>% select(species) %>% distinct()
 
 time4_2 = NULL
 for(i in 1:nrow(splist_t1)){
@@ -337,16 +340,17 @@ for(i in 1:nrow(splist_t1)){
   t2 = t2 %>% replace_na(list(sum_area = 0))
   time4_2 = rbind(time4_2, t2)
 }
-df_time4_0 = time4_2
-save(df_time4_0, file = "df_time4_0.Rdata")
-
-
-df_a_0_sugi = rbind(time1_2, time2_2, time3_2, time4_2) %>% mutate(effort = 1000)
-summary(df_a_0_sugi)
-
+df_a_time4_0 = time4_2
 setwd("/Users/Yuki/Dropbox/NFI")
-write_csv(df_n_0, "df_n_0.csv")
-save(df_a_0_sugi, file = "sugi_a_0.Rdata")
+save(df_a_time4_0, file = "df_a_time4_0.Rdata")
+
+
+# df_a_0_sugi = rbind(time1_2, time2_2, time3_2, time4_2) %>% mutate(effort = 1000)
+# summary(df_a_0_sugi)
+# 
+# setwd("/Users/Yuki/Dropbox/NFI")
+# write_csv(df_n_0, "df_n_0.csv")
+# save(df_a_0_sugi, file = "sugi_a_0.Rdata")
 
 
 
