@@ -6,8 +6,19 @@ setwd(dir)
 
 site_lonlat = read.csv("site_lonlat.csv", fileEncoding = "CP932")
 
+
+products <- mt_products()
+head(products)
+
+bands <- mt_bands(product = "MOD11A2")
+head(bands)
+
+dates <- mt_dates(product = "MOD11A2", lat = 40, lon = 141)
+head(dates)
+
+
 modis = NULL
-for(i in 1:nrow(site_lonlat)){
+for(i in 81:nrow(site_lonlat)){
   lon = site_lonlat[i, "lon"]
   lat = site_lonlat[i, "lat"]
   tag = site_lonlat[i, "tag"]
@@ -34,4 +45,4 @@ for(i in 1:nrow(site_lonlat)){
 }
 modis_t1 = modis
 setwd(dir)
-save(modis_t1, "modis_t1.Rdata")
+save(modis_t1, file = "modis_t1.Rdata")
