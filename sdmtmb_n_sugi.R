@@ -16,7 +16,6 @@ df = df_sugi
 summary(df)
 
 df = df %>% 
-  filter(spp == "スギ") %>%
   # mutate(cpue = n/effort) %>% 
   # select(year, lat, lon, n, cpue, species, slope, elevation) %>% 
   # rename(spp = species)
@@ -72,7 +71,7 @@ sanity(fit1)
 
 
 fit2<- sdmTMB(
-  obs ~ s(elevation) + s(slope) + lat + as.factor(year),
+  obs ~ s(elevation) + s(slope) + as.factor(year),
   data = df,
   mesh = mesh,
   family = poisson(),
@@ -105,7 +104,7 @@ p = predict(fit2, newdata = grid2, type = "response")
 p[1:3, ]
 p_s = st_as_sf(p, coords=c("lon", "lat"))
 summary(p_s)
-ggplot(p_s %>% filter(est >= 1)) + 
+ggplot(p_s %>% filter(between(est, 1, 150))) + 
   geom_sf(aes(color = est), pch=15,cex=0.5) +
   facet_wrap(~year) + 
   theme_minimal() +
@@ -114,7 +113,7 @@ ggplot(p_s %>% filter(est >= 1)) +
 
 p_s %>% group_by(year) %>% summarize(mean = mean(est))
 
-
+hist(p_s$est, breaks = seq(0, 580, 5))
 
 # 予測値の不確実性の評価 -----------------------------------------------------------------
 p2_sim     <- predict(fit2, newdata = grid2, type="response", nsim=500)
