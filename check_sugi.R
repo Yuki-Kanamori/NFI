@@ -20,7 +20,7 @@ df = df %>%
   rename(spp = species)
 summary(df)
 df_a = df
-
+summary(df_a)
 
 load("sugi_n_0.Rdata")
 df = sugi_n_0
@@ -33,6 +33,8 @@ df = df %>%
   rename(spp = species)
 summary(df)
 df_n = df
+summary(df_n)
+
 
 # データのチェック --------------------------------------------------------------
 # area
@@ -48,11 +50,29 @@ tag = df_a %>% select(lon, lat) %>% mutate(tag = paste(lon, lat, sep = "_")) %>%
 
 tag2_a = left_join(tag, time1, by = "tag")
 tag2_a = left_join(tag2_a, time2, by = "tag")
+summary(tag2_a)
 tag2_a = left_join(tag2_a, time3, by = "tag")
 tag2_a = left_join(tag2_a, time4, by = "tag")
+summary(tag2_a)
 
-rate_a = data.frame(tag = tag2_a$tag, time1to2_a = ((tag2_a$time2)+0.001)/((tag2_a$time1)+0.001), time2to3_a = ((tag2_a$time3)+0.001)/((tag2_a$time2)+0.001), time3to4_a = ((tag2_a$time4)+0.01)/((tag2_a$time3)+0.01))
-summary(rate)
+# tag2_a$time1 = tag2$time1+0.001
+# tag2_a$time2 = tag2$time2+0.001
+# tag2_a$time3 = tag2$time3+0.001
+# tag2_a$time4 = tag2$time4+0.001
+
+tag3_a = tag2_a %>% mutate(check = rowSums(tag2_a[, 2:5], na.rm = T)) %>% filter(check != 0)
+
+plot(x = tag3_a$time1, y = tag3_a$time2)
+plot(x = tag3_a$time2, y = tag3_a$time3)
+plot(x = tag3_a$time3, y = tag3_a$time4)
+
+tag3_a$time1 = ifelse(tag3_a$time1 == 0, tag3_a$time1+0.1, tag3_a$time1)
+tag3_a$time2 = ifelse(tag3_a$time2 == 0, tag3_a$time2+0.1, tag3_a$time2)
+tag3_a$time3 = ifelse(tag3_a$time3 == 0, tag3_a$time3+0.1, tag3_a$time3)
+tag3_a$time4 = ifelse(tag3_a$time4 == 0, tag3_a$time4+0.1, tag3_a$time4)
+
+rate_a = data.frame(tag = tag3_a$tag, time1to2_a = tag3_a$time2/tag3_a$time1, time2to3_a = tag3_a$time3/tag3_a$time2, time3to4_a = tag3_a$time4/tag3_a$time3)
+summary(rate_a)
 
 
 # n
@@ -71,13 +91,31 @@ tag2_n = left_join(tag2_n, time2, by = "tag")
 tag2_n = left_join(tag2_n, time3, by = "tag")
 tag2_n = left_join(tag2_n, time4, by = "tag")
 
-rate_n = data.frame(tag = tag2$tag, time1to2_n = ((tag2_n$time2)+0.001)/((tag2_n$time1)+0.001), time2to3_n = ((tag2_n$time3)+0.001)/((tag2_n$time2)+0.001), time3to4_n = ((tag2_n$time4)+0.01)/((tag2_n$time3)+0.01))
+tag3_n = tag2_n %>% mutate(check = rowSums(tag2_n[, 2:5], na.rm = T)) %>% filter(check != 0)
 
+plot(x = tag3_n$time1, y = tag3_n$time2)
+plot(x = tag3_n$time2, y = tag3_n$time3)
+plot(x = tag3_n$time3, y = tag3_n$time4)
+
+tag3_n$time1 = ifelse(tag3_n$time1 == 0, tag3_n$time1+0.1, tag3_n$time1)
+tag3_n$time2 = ifelse(tag3_n$time2 == 0, tag3_n$time2+0.1, tag3_n$time2)
+tag3_n$time3 = ifelse(tag3_n$time3 == 0, tag3_n$time3+0.1, tag3_n$time3)
+tag3_n$time4 = ifelse(tag3_n$time4 == 0, tag3_n$time4+0.1, tag3_n$time4)
+
+rate_n = data.frame(tag = tag3_n$tag, time1to2_n = tag3_n$time2/tag3_n$time1, time2to3_n = tag3_n$time3/tag3_n$time2, time3to4_n = tag3_n$time4/tag3_n$time3)
+summary(rate_n)
+
+
+options(scipen=100)
 rate = left_join(rate_a, rate_n, by = "tag")
 rate[is.na(rate)] = -50
 rate = rate %>% mutate(check = rowSums(rate[, 2:7]))
-
-rate2 = rate %>% filter(check != 6) %>% filter(check != -300) %>% mutate(time1to2_a = if_else(time1to2_a == -50, NA_real_, time1to2_a), time2to3_a = if_else(time2to3_a == -50, NA_real_, time2to3_a), time3to4_a = if_else(time3to4_a == -50, NA_real_, time3to4_a), time1to2_n = if_else(time1to2_n == -50, NA_real_, time1to2_n), time2to3_n = if_else(time2to3_n == -50, NA_real_, time2to3_n), time3to4_n = if_else(time3to4_n == -50, NA_real_, time3to4_n))
+# options(digits=2)
+rate2 = rate %>% filter(check != -300) %>% mutate(time1to2_a = if_else(time1to2_a == -50, NA_real_, time1to2_a), time2to3_a = if_else(time2to3_a == -50, NA_real_, time2to3_a), time3to4_a = if_else(time3to4_a == -50, NA_real_, time3to4_a), time1to2_n = if_else(time1to2_n == -50, NA_real_, time1to2_n), time2to3_n = if_else(time2to3_n == -50, NA_real_, time2to3_n), time3to4_n = if_else(time3to4_n == -50, NA_real_, time3to4_n)) %>% select(-check)
 
 setwd(dir)
-write.csv(rate2 %>% select(-check), "rate_sugi_nat.csv", fileEncoding = "CP932", row.names = F)
+write.csv(rate2, "rate_sugi_nat.csv", fileEncoding = "CP932", row.names = F)
+
+check1 = rate2 %>% filter(time1to2_n < 1) %>% filter(time1to2_a >= 2.5)
+check2 = rate2 %>% filter(time2to3_n < 1) %>% filter(time2to3_a >= 2.5)
+check3 = rate2 %>% filter(time3to4_n < 1) %>% filter(time3to4_a >= 2.5)
