@@ -10,6 +10,9 @@ site_lonlat = read.csv("site_lonlat.csv", fileEncoding = "CP932")
 products <- mt_products()
 head(products)
 
+# MOD11A2 lst
+# MOD10A2 snowcover
+# MCD15A2H
 bands <- mt_bands(product = "MOD11A2")
 head(bands)
 
