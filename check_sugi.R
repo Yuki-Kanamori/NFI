@@ -141,3 +141,189 @@ setwd(dir)
 write.csv(check1, "Npos_time1to2.csv", fileEncoding = "CP932", row.names = F)
 write.csv(check2, "Npos_time2to3.csv", fileEncoding = "CP932", row.names = F)
 write.csv(check3, "Npos_time3to4.csv", fileEncoding = "CP932", row.names = F)
+
+
+
+# データの除去 ------------------------------------------------------------------
+setwd(dir)
+
+# load data ---------------------------------------------------------------
+load("sugi_a_0.Rdata")
+df = df_a_0_sugi
+summary(df)
+unique(df$type)
+df = df %>% 
+  filter(type == "天然林") %>%
+  mutate(cpue = sum_area/effort, tag = paste(lon, lat, sep = "_")) %>% 
+  select(year, lat, lon, sum_area, cpue, species, slope, elevation) %>% 
+  rename(spp = species)
+summary(df)
+df_a = df
+summary(df_a)
+
+
+load("sugi_n_0.Rdata")
+df = sugi_n_0
+summary(df)
+unique(df$type)
+df = df %>% 
+  filter(type == "天然林") %>%
+  mutate(cpue = n/effort, tag = paste(lon, lat, sep = "_")) %>% 
+  select(year, lat, lon, n, cpue, species, slope, elevation) %>% 
+  rename(spp = species)
+summary(df)
+df_n = df
+summary(df_n)
+
+
+head(df_a, 3)
+head(df_n, 3)
+
+df = rbind(df_a %>% rename(obs = sum_area) %>% mutate(area_n = "area"),
+           df_n %>% rename(obs = n) %>% mutate(area_n = "n")) %>% mutate(tag = paste(lon, lat, sep = "_"))
+
+df_t1 = df %>% filter(year == 1)
+df_t2 = df %>% filter(year == 2)
+df_t3 = df %>% filter(year == 3)
+df_t4 = df %>% filter(year == 4)
+
+# 該当データを抜く（木の数が減ってるのに面積が増えているもの）
+check1 = read.csv("Nneg_time1to2.csv", fileEncoding = "CP932")
+check2 = read.csv("Nneg_time2to3.csv", fileEncoding = "CP932")
+check3 = read.csv("Nneg_time3to4.csv", fileEncoding = "CP932")
+
+# t = 1
+tag_t1 = df_t1 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
+tag_c1 = check1 %>% select(tag) %>% distinct(tag) %>% mutate(data2 = -1)
+check_tag1 = left_join(tag_t1, tag_c1, by = "tag") 
+check_tag1[is.na(check_tag1)] = 0
+
+df_t1 = left_join(df_t1, check_tag1, by = "tag")
+df_t1 = df_t1 %>% filter(data2 != -1)
+
+
+# t = 2
+# データ2からcheck1を除去
+tag_t2 = df_t2 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
+tag_c1 = check1 %>% select(tag) %>% distinct(tag) %>% mutate(data2 = -1)
+check_tag2 = left_join(tag_t2, tag_c1, by = "tag") 
+check_tag2[is.na(check_tag2)] = 0
+
+df_t2 = left_join(df_t2, check_tag2, by = "tag")
+df_t2 = df_t2 %>% filter(data2 != -1)
+
+# データ2からcheck2を除去
+tag_t2 = df_t2 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
+tag_c2 = check2 %>% select(tag) %>% distinct(tag) %>% mutate(data2 = -1)
+check_tag2 = left_join(tag_t2, tag_c2, by = "tag") 
+check_tag2[is.na(check_tag2)] = 0
+
+df_t2 = left_join(df_t2, check_tag2, by = "tag")
+df_t2 = df_t2 %>% filter(data2.y != -1)
+
+
+# t = 3
+# データ3からチェック2を除去
+tag_t3 = df_t3 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
+tag_c2 = check2 %>% select(tag) %>% distinct(tag) %>% mutate(data2 = -1)
+check_tag3 = left_join(tag_t3, tag_c2, by = "tag") 
+check_tag3[is.na(check_tag3)] = 0
+
+df_t3 = left_join(df_t3, check_tag3, by = "tag")
+df_t3 = df_t3 %>% filter(data2 != -1)
+
+
+# データ3からチェック3を除去
+tag_t3 = df_t3 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
+tag_c3 = check3 %>% select(tag) %>% distinct(tag) %>% mutate(data2 = -1)
+check_tag3 = left_join(tag_t3, tag_c3, by = "tag") 
+check_tag3[is.na(check_tag3)] = 0
+
+df_t3 = left_join(df_t3, check_tag3, by = "tag")
+df_t3 = df_t3 %>% filter(data2.y != -1)
+
+
+# t = 4
+# データ4からチェック3を除去
+tag_t4 = df_t4 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
+tag_c3 = check3 %>% select(tag) %>% distinct(tag) %>% mutate(data2 = -1)
+check_tag4 = left_join(tag_t4, tag_c3, by = "tag") 
+check_tag4[is.na(check_tag4)] = 0
+
+df_t4 = left_join(df_t4, check_tag4, by = "tag")
+df_t4 = df_t4 %>% filter(data2 != -1)
+
+
+
+# 該当データを抜く（木の数が減ってるのに面積が増えているもの）
+check1 = read.csv("Npos_time1to2.csv", fileEncoding = "CP932")
+check2 = read.csv("Npos_time2to3.csv", fileEncoding = "CP932")
+check3 = read.csv("Npos_time3to4.csv", fileEncoding = "CP932")
+
+# t = 1
+tag_t1 = df_t1 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
+tag_c1 = check1 %>% select(tag) %>% distinct(tag) %>% mutate(data2 = -1)
+check_tag1 = left_join(tag_t1, tag_c1, by = "tag") 
+check_tag1[is.na(check_tag1)] = 0
+
+df_t1 = left_join(df_t1, check_tag1, by = "tag")
+df_t1 = df_t1 %>% filter(data2.y != -1)
+
+
+# t = 2
+# データ2からcheck1を除去
+tag_t2 = df_t2 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
+tag_c1 = check1 %>% select(tag) %>% distinct(tag) %>% mutate(data2 = -1)
+check_tag2 = left_join(tag_t2, tag_c1, by = "tag") 
+check_tag2[is.na(check_tag2)] = 0
+
+df_t2 = left_join(df_t2, check_tag2, by = "tag")
+df_t2 = df_t2 %>% filter(data2.y != -1)
+
+# データ2からcheck2を除去
+tag_t2 = df_t2 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
+tag_c2 = check2 %>% select(tag) %>% distinct(tag) %>% mutate(data2 = -1)
+check_tag2 = left_join(tag_t2, tag_c2, by = "tag") 
+check_tag2[is.na(check_tag2)] = 0
+
+df_t2 = left_join(df_t2, check_tag2, by = "tag")
+df_t2 = df_t2 %>% filter(data2.y.y != -1)
+
+
+# t = 3
+# データ3からチェック2を除去
+tag_t3 = df_t3 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
+tag_c2 = check2 %>% select(tag) %>% distinct(tag) %>% mutate(data2 = -1)
+check_tag3 = left_join(tag_t3, tag_c2, by = "tag") 
+check_tag3[is.na(check_tag3)] = 0
+
+df_t3 = left_join(df_t3, check_tag3, by = "tag")
+df_t3 = df_t3 %>% filter(data2.y != -1)
+
+
+# データ3からチェック3を除去
+tag_t3 = df_t3 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
+tag_c3 = check3 %>% select(tag) %>% distinct(tag) %>% mutate(data2 = -1)
+check_tag3 = left_join(tag_t3, tag_c3, by = "tag") 
+check_tag3[is.na(check_tag3)] = 0
+
+df_t3 = left_join(df_t3, check_tag3, by = "tag")
+df_t3 = df_t3 %>% filter(data2.y.y != -1)
+
+
+# t = 4
+# データ4からチェック3を除去
+tag_t4 = df_t4 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
+tag_c3 = check3 %>% select(tag) %>% distinct(tag) %>% mutate(data2 = -1)
+check_tag4 = left_join(tag_t4, tag_c3, by = "tag") 
+check_tag4[is.na(check_tag4)] = 0
+
+df_t4 = left_join(df_t4, check_tag4, by = "tag")
+df_t4 = df_t4 %>% filter(data2.y != -1)
+
+
+df_sugi = rbind(df_t1 %>% select(tag, lon, lat, year, obs, cpue, spp, slope, elevation, area_n),
+                df_t2 %>% select(tag, lon, lat, year, obs, cpue, spp, slope, elevation, area_n),
+                df_t3 %>% select(tag, lon, lat, year, obs, cpue, spp, slope, elevation, area_n),
+                df_t4 %>% select(tag, lon, lat, year, obs, cpue, spp, slope, elevation, area_n))
+save(df_sugi, file = "df_sugi_natural.Rdata")
