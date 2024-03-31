@@ -21,6 +21,7 @@ df = df %>%
   # rename(spp = species)
   filter(area_n == "n")
 summary(df)
+summary(df$obs)
 
 df = df %>% na.omit()
 
@@ -86,8 +87,35 @@ tidy(fit2, conf.int = TRUE)
 tidy(fit2, effects = "ran_pars", conf.int = TRUE)
 sanity(fit2)
 
+
+fit3<- sdmTMB(
+  obs ~ s(elevation) + s(slope) + as.factor(year),
+  data = df,
+  mesh = mesh,
+  family = poisson(),
+  spatial = "on",
+  time = "year",
+  spatiotemporal = "AR1",
+  anisotropy = TRUE,
+  reml=FALSE)
+
+
+fit4<- sdmTMB(
+  obs ~ s(elevation) + s(slope) + as.factor(year),
+  data = df,
+  mesh = mesh,
+  family = poisson(),
+  spatial = "on",
+  time = "year",
+  spatiotemporal = "RW",
+  anisotropy = TRUE,
+  reml=FALSE)
+
+
 AIC(fit1)
 AIC(fit2)
+AIC(fit3)
+AIC(fit4)
 
 # 予測 ----------------------------------------------------------------------
 df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
@@ -101,17 +129,20 @@ for(year in unique(df$year)){
 
 grid2[1:2,]
 p = predict(fit2, newdata = grid2, type = "response")
+p = predict(fit3, newdata = grid2, type = "response")
+p = predict(fit4, newdata = grid2, type = "response")
 p[1:3, ]
 p_s = st_as_sf(p, coords=c("lon", "lat"))
 summary(p_s)
-ggplot(p_s %>% filter(between(est, 1, 150))) + 
+ggplot(p_s %>% filter(est > 1)) + 
   geom_sf(aes(color = est), pch=15,cex=0.5) +
   facet_wrap(~year) + 
   theme_minimal() +
   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
   # scale_color_gradient(low = "lightgrey", high = "red")
+summary(p_s$est)
 
-p_s %>% group_by(year) %>% summarize(mean = mean(est))
+p_s %>% p_sp_s %>% group_by(year) %>% summarize(mean = mean(est))
 
 hist(p_s$est, breaks = seq(0, 580, 5))
 
