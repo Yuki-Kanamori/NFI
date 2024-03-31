@@ -279,7 +279,7 @@ lonlat_t2 = time2 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = 
 splist_t2 = time2 %>% select(species) %>% distinct()
 
 time2_2 = NULL
-for(i in 1:nrow(splist_t1)){
+for(i in 1:nrow(splist_t2)){
   sp = splist_t2[i, 1]
   t1 = time2_a %>% filter(species == sp) 
   t1 = t1[, c("tag", "type", "species", "sum_area")]
@@ -305,7 +305,7 @@ lonlat_t3 = time3 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = 
 splist_t3 = time3 %>% select(species) %>% distinct()
 
 time3_2 = NULL
-for(i in 1:nrow(splist_t1)){
+for(i in 1:nrow(splist_t3)){
   sp = splist_t3[i, 1]
   t1 = time3_a %>% filter(species == sp) 
   t1 = t1[, c("tag", "type", "species", "sum_area")]
@@ -330,7 +330,7 @@ lonlat_t4 = time4 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = 
 splist_t4 = time1 %>% select(species) %>% distinct()
 
 time4_2 = NULL
-for(i in 1:nrow(splist_t1)){
+for(i in 1:nrow(splist_t4)){
   sp = splist_t4[i, 1]
   t1 = time4_a %>% filter(species == sp) 
   t1 = t1[, c("tag", "type", "species", "sum_area")]
