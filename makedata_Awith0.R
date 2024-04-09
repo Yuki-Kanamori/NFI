@@ -5,7 +5,7 @@ require(tidyverse)
 dir_data1 = "/Users/Yuki/Dropbox/NFI/NFI_1_CSV/第1期"
 setwd(dir_data1)
 
-site1 = read.csv("01_プロット.csv", fileEncoding = "CP932")
+site1 = read.csv("01_プロット.csv", fileEncoding = "CP932")
 head(site1)
 site1 = site1 %>% select("格子点ID", "世界北緯１", "世界東経１")
 colnames(site1) = c("site_id", "lat", "lon")
@@ -64,7 +64,7 @@ time1 = rbind(df_s1, df_m1, df_l1) %>% mutate(tag = paste(lon, lat, sep = "_"))
 dir_data2 = "/Users/Yuki/Dropbox/NFI/NFI_2_CSV/第2期"
 setwd(dir_data2)
 
-site2 = read.csv("01_プロット.csv", fileEncoding = "CP932")
+site2 = read.csv("01_プロット.csv", fileEncoding = "CP932")
 site2 = site2 %>% select("格子点ID", "世界北緯１", "世界東経１")
 colnames(site2) = c("site_id", "lat", "lon")
 
@@ -122,7 +122,7 @@ time2 = rbind(df_s2, df_m2, df_l2) %>% mutate(tag = paste(lon, lat, sep = "_"))
 dir_data3 = "/Users/Yuki/Dropbox/NFI/NFI_3_CSV/第3期"
 setwd(dir_data3)
 
-site3 = read.csv("01_プロット.csv", fileEncoding = "CP932")
+site3 = read.csv("01_プロット.csv", fileEncoding = "CP932")
 site3 = site3 %>% select("格子点ID", "世界北緯1", "世界東経1")
 colnames(site3) = c("site_id", "lat", "lon")
 
@@ -181,7 +181,7 @@ head(time3, 3)
 dir_data4 = "/Users/Yuki/Dropbox/NFI/NFI_4_CSV/第4期"
 setwd(dir_data4)
 
-site4 = read.csv("01_プロット.csv", fileEncoding = "CP932")
+site4 = read.csv("01_プロット.csv", fileEncoding = "CP932")
 site4 = site4 %>% select("格子点ID", "世界北緯1", "世界東経1")
 colnames(site4) = c("site_id", "lat", "lon")
 
@@ -251,7 +251,7 @@ time1_a = left_join(time1_a, site1, by = "site_id") %>% mutate(year = 1, tag = p
 
 lonlat_t1 = time1 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13865
 
-splist_t1 = time1 %>% select(species) %>% distinct()
+splist_t1 = time1 %>% select(species) %>% distinct() %>% filter(species == "アカマツ")
 
 time1_2 = NULL
 for(i in 1:nrow(splist_t1)){
@@ -276,7 +276,7 @@ time2_a = left_join(time2_a, site2, by = "site_id") %>% mutate(year = 2, tag = p
 
 lonlat_t2 = time2 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13940
 
-splist_t2 = time2 %>% select(species) %>% distinct()
+splist_t2 = time2 %>% select(species) %>% distinct() %>% filter(species == "アカマツ")
 
 time2_2 = NULL
 for(i in 1:nrow(splist_t2)){
@@ -302,7 +302,7 @@ head(time3_a)
 
 lonlat_t3 = time3 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13286
 
-splist_t3 = time3 %>% select(species) %>% distinct()
+splist_t3 = time3 %>% select(species) %>% distinct() %>% filter(species == "アカマツ")
 
 time3_2 = NULL
 for(i in 1:nrow(splist_t3)){
@@ -327,7 +327,7 @@ time4_a = left_join(time4_a, site4 %>% select(-type), by = "site_id") %>% mutate
 
 lonlat_t4 = time4 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #12648
 
-splist_t4 = time1 %>% select(species) %>% distinct()
+splist_t4 = time1 %>% select(species) %>% distinct() %>% filter(species == "アカマツ")
 
 time4_2 = NULL
 for(i in 1:nrow(splist_t4)){
@@ -336,7 +336,7 @@ for(i in 1:nrow(splist_t4)){
   t1 = t1[, c("tag", "type", "species", "sum_area")]
   
   t2 = left_join(lonlat_t4, t1, by = c("tag", "type")) %>% mutate(year = 4)
-  t2$species = paste(i)
+  t2$species = paste(splist_t4[i, 1])
   t2 = t2 %>% replace_na(list(sum_area = 0))
   time4_2 = rbind(time4_2, t2)
 }
@@ -345,12 +345,12 @@ setwd("/Users/Yuki/Dropbox/NFI")
 save(df_a_time4_0, file = "df_a_time4_0.Rdata")
 
 
-# df_a_0_sugi = rbind(time1_2, time2_2, time3_2, time4_2) %>% mutate(effort = 1000)
-# summary(df_a_0_sugi)
-# 
-# setwd("/Users/Yuki/Dropbox/NFI")
-# write_csv(df_n_0, "df_n_0.csv")
-# save(df_a_0_sugi, file = "sugi_a_0.Rdata")
+df_a_0_akamatsu = rbind(time1_2, time2_2, time3_2, time4_2) %>% mutate(effort = 1000)
+summary(df_a_0_sugi)
+
+setwd("/Users/Yuki/Dropbox/NFI")
+write_csv(df_n_0, "df_n_0.csv")
+save(df_a_0_akamatsu, file = "akamatsu_a_0.Rdata")
 
 
 
