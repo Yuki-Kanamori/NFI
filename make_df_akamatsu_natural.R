@@ -11,14 +11,14 @@ setwd(dir)
 # area
 load("akamatsu_a_0.Rdata")
 
-head(df_a_0_hinoki, 3)
+head(df_a_0_akamatsu, 3)
 df_a = df_a_0_akamatsu %>% filter(species == "アカマツ", type == "天然林")
 
 # n
 load("akamatsu_n_0.Rdata")
 
-head(hinoki_n_0, 3)
-df_n = df_n_0_akamatsu %>% filter(species == "アカマツ", type == "天然林")
+head(df_n_0_akamatsu, 3)
+df_n = df_n_0_akamatsu %>% filter(species == "アカマツ", type == "天然林") %>% mutate(effort = 1000)
 
 
 # 変化率 ---------------------------------------------------------------------
@@ -240,8 +240,8 @@ df_t4 = df_t4 %>% filter(data2.y != -1)
 
 head(df_t1)
 
-df_akamatsu = rbind(df_t1 %>% select(tag, lon, lat, year, obs, species, slope, elevation, area_n),
-                    df_t2 %>% select(tag, lon, lat, year, obs, species, slope, elevation, area_n),
-                    df_t3 %>% select(tag, lon, lat, year, obs, species, slope, elevation, area_n),
-                    df_t4 %>% select(tag, lon, lat, year, obs, species, slope, elevation, area_n))
+df_akamatsu = rbind(df_t1 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, species, slope, elevation, area_n),
+                    df_t2 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, species, slope, elevation, area_n),
+                    df_t3 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, species, slope, elevation, area_n),
+                    df_t4 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, species, slope, elevation, area_n))
 save(df_akamatsu, file = "df_akamatsu_natural.Rdata")
