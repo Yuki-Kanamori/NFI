@@ -240,8 +240,8 @@ df_t4 = df_t4 %>% filter(data2.y != -1)
 
 head(df_t1)
 
-df_akamatsu = rbind(df_t1 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, species, slope, elevation, area_n),
-                    df_t2 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, species, slope, elevation, area_n),
-                    df_t3 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, species, slope, elevation, area_n),
-                    df_t4 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, species, slope, elevation, area_n))
+df_akamatsu = rbind(df_t1 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n),
+                    df_t2 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n),
+                    df_t3 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n),
+                    df_t4 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n))
 save(df_akamatsu, file = "df_akamatsu_natural.Rdata")
