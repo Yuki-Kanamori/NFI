@@ -16,7 +16,7 @@ df = df_akamatsu
 summary(df)
 
 df = df %>% 
-  # mutate(cpue = n/effort) %>% 
+  # mutate(cpue = obs/effort) %>% 
   # select(year, lat, lon, n, cpue, species, slope, elevation) %>% 
   # rename(spp = species)
   filter(area_n == "n")
@@ -30,7 +30,7 @@ hist(df$obs, breaks=seq(0, 370, 5))
 # データの地図 ------------------------------------------------------------------
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
 ggplot(pcod_s %>% filter(obs > 0)) + 
-  geom_sf(aes(color = obs), pch=15,cex=0.5) +
+  geom_sf(aes(color = cpue), pch=15,cex=0.5) +
   facet_wrap(~ year) + 
   theme_minimal() +
   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
@@ -46,10 +46,10 @@ plot(mesh, pch=1)
 
 # フィッティング -----------------------------------------------------------------
 fit1<- sdmTMB(
-  n ~ s(elevation) + as.factor(year),
+  cpue ~ s(elevation) + as.factor(year),
   data = df,
   mesh = mesh,
-  family = poisson(),
+  family = delta_lognormal(),
   spatial = "on",
   anisotropy = TRUE,
   reml=FALSE)
@@ -119,19 +119,20 @@ for(year in unique(df$year)){
 }
 
 grid2[1:2,]
+p = predict(fit1, newdata = grid2, type = "response")
 p = predict(fit2, newdata = grid2, type = "response")
 p = predict(fit3, newdata = grid2, type = "response")
 p = predict(fit4, newdata = grid2, type = "response")
 p[1:3, ]
 p_s = st_as_sf(p, coords=c("lon", "lat"))
 summary(p_s)
-ggplot(p_s %>% filter(est > 1)) + 
+ggplot(p_s %>% filter(est2 > 0)) + 
   geom_sf(aes(color = est), pch=15,cex=0.5) +
   facet_wrap(~year) + 
   theme_minimal() +
   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
 # scale_color_gradient(low = "lightgrey", high = "red")
-summary(p_s$est)
+summary(p_s$est2)
 
 p_s %>% p_sp_s %>% group_by(year) %>% summarize(mean = mean(est))
 
