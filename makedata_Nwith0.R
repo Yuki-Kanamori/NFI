@@ -5,7 +5,7 @@ require(tidyverse)
 dir_data1 = "/Users/Yuki/Dropbox/NFI/NFI_1_CSV/第1期"
 setwd(dir_data1)
 
-site1 = read.csv("01_プロット.csv", fileEncoding = "CP932")
+site1 = read.csv("01_プロット.csv", fileEncoding = "CP932")
 head(site1)
 site1 = site1 %>% select("格子点ID", "世界北緯１", "世界東経１")
 colnames(site1) = c("site_id", "lat", "lon")
@@ -64,7 +64,7 @@ time1 = rbind(df_s1, df_m1, df_l1) %>% mutate(tag = paste(lon, lat, sep = "_"))
 dir_data2 = "/Users/Yuki/Dropbox/NFI/NFI_2_CSV/第2期"
 setwd(dir_data2)
 
-site2 = read.csv("01_プロット.csv", fileEncoding = "CP932")
+site2 = read.csv("01_プロット.csv", fileEncoding = "CP932")
 site2 = site2 %>% select("格子点ID", "世界北緯１", "世界東経１")
 colnames(site2) = c("site_id", "lat", "lon")
 
@@ -122,7 +122,7 @@ time2 = rbind(df_s2, df_m2, df_l2) %>% mutate(tag = paste(lon, lat, sep = "_"))
 dir_data3 = "/Users/Yuki/Dropbox/NFI/NFI_3_CSV/第3期"
 setwd(dir_data3)
 
-site3 = read.csv("01_プロット.csv", fileEncoding = "CP932")
+site3 = read.csv("01_プロット.csv", fileEncoding = "CP932")
 site3 = site3 %>% select("格子点ID", "世界北緯1", "世界東経1")
 colnames(site3) = c("site_id", "lat", "lon")
 
@@ -181,7 +181,7 @@ head(time3, 3)
 dir_data4 = "/Users/Yuki/Dropbox/NFI/NFI_4_CSV/第4期"
 setwd(dir_data4)
 
-site4 = read.csv("01_プロット.csv", fileEncoding = "CP932")
+site4 = read.csv("01_プロット.csv", fileEncoding = "CP932")
 site4 = site4 %>% select("格子点ID", "世界北緯1", "世界東経1")
 colnames(site4) = c("site_id", "lat", "lon")
 
@@ -249,7 +249,7 @@ time1_n = left_join(time1_n, site1, by = "site_id") %>% mutate(year = 1, tag = p
 
 lonlat_t1 = time1 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13865
 
-splist_t1 = time1 %>% select(species) %>% distinct() %>% filter(species == "スギ")
+splist_t1 = time1 %>% select(species) %>% distinct() %>% filter(species == "アカマツ")
 
 time1_2 = NULL
 for(i in 1:nrow(splist_t1)){
@@ -272,10 +272,10 @@ time2_n = left_join(time2_n, site2, by = "site_id") %>% mutate(year = 2, tag = p
 
 lonlat_t2 = time2 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13940
 
-splist_t2 = time2 %>% select(species) %>% distinct() %>% filter(species == "スギ")
+splist_t2 = time2 %>% select(species) %>% distinct() %>% filter(species == "アカマツ")
 
 time2_2 = NULL
-for(i in 1:nrow(splist_t1)){
+for(i in 1:nrow(splist_t2)){
   sp = splist_t2[i, 1]
   t1 = time2_n %>% filter(species == sp) 
   t1 = t1[, c("tag", "type", "species", "n")]
@@ -296,10 +296,10 @@ head(time3_n)
 
 lonlat_t3 = time3 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #13286
 
-splist_t3 = time3 %>% select(species) %>% distinct() %>% filter(species == "スギ")
+splist_t3 = time3 %>% select(species) %>% distinct() %>% filter(species == "アカマツ")
 
 time3_2 = NULL
-for(i in 1:nrow(splist_t1)){
+for(i in 1:nrow(splist_t3)){
   sp = splist_t3[i, 1]
   t1 = time3_n %>% filter(species == sp) 
   t1 = t1[, c("tag", "type", "species", "n")]
@@ -319,10 +319,10 @@ time4_n = left_join(time4_n, site4 %>% select(-type), by = "site_id") %>% mutate
 
 lonlat_t4 = time4 %>% select(lon, lat, type, elevation, slope) %>% mutate(tag = paste(lon, lat, sep = "_")) %>% distinct(tag, .keep_all = T) #12648
 
-splist_t4 = time1 %>% select(species) %>% distinct() %>% filter(species == "スギ")
+splist_t4 = time1 %>% select(species) %>% distinct() %>% filter(species == "アカマツ")
 
 time4_2 = NULL
-for(i in 1:nrow(splist_t1)){
+for(i in 1:nrow(splist_t4)){
   sp = splist_t4[i, 1]
   t1 = time4_n %>% filter(species == sp) 
   t1 = t1[, c("tag", "type", "species", "n")]
@@ -337,13 +337,11 @@ df_time4_0 = time4_2
 save(df_time4_0, file = "df_time4_0.Rdata")
 
 
-df_n_0 = rbind(time1_2, time2_2, time3_2, time4_2) %>% mutate(effort = 0.1)
+df_n_0_akamatsu = rbind(time1_2, time2_2, time3_2, time4_2) %>% mutate(effort = 0.1)
 site_lonlat = rbind(lonlat_t1, lonlat_t2, lonlat_t3, lonlat_t4) %>% distinct(tag, .keep_all = T)
 
 setwd("/Users/Yuki/Dropbox/NFI")
-write_csv(df_n_0, "df_n_0.csv")
-save(df_n_0, file = "df_n_0.Rdata")
-write.csv(site_lonlat, "site_lonlat.csv", fileEncoding = "CP932", row.names = F)
+save(df_n_0_akamatsu, file = "akamatsu_n_0.Rdata")
 
 sugi_n_0 = df_n_0
 unique(sugi_n_0$species)
