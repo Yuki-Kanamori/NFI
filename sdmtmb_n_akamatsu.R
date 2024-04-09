@@ -28,6 +28,15 @@ summary(df$obs)
 df = df %>% na.omit() %>% filter(elevation > 0)
 hist(df$obs, breaks=seq(0, 370, 5))
 
+# t1 = df %>% filter(year == 1)
+# t2 = df %>% filter(year == 2)
+# t3 = df %>% filter(year == 3)
+# t4 = df %>% filter(year == 4)
+
+plot(x = df$elevation, y = df$cpue)
+df2 = df %>% mutate(pa = ifelse(cpue > 0, 1, 0))
+plot(x = df2$elevation, y = df2$pa)
+
 
 # データの地図 ------------------------------------------------------------------
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
