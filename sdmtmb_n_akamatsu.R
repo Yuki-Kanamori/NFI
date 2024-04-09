@@ -7,6 +7,8 @@ require(tidyverse)
 require(sdmTMB)
 library(sf)
 library(sp)
+require(DHARMa)
+require(visreg)
 
 # read the data
 # df = read.csv("sugi_n.csv", fileEncoding = "CP932")
@@ -23,7 +25,7 @@ df = df %>%
 summary(df)
 summary(df$obs)
 
-df = df %>% na.omit()
+df = df %>% na.omit() %>% filter(elevation > 0)
 hist(df$obs, breaks=seq(0, 370, 5))
 
 
@@ -58,6 +60,16 @@ fit1
 tidy(fit1, conf.int = TRUE)
 tidy(fit1, effects = "ran_pars", conf.int = TRUE)
 sanity(fit1)
+
+# residual
+qq1 <- residuals(fit1)
+qq1 <- qq1[is.finite(qq1)] # some Inf
+qqnorm(qq1);qqline(qq1)
+
+# simulation based residual
+s_qq <- simulate(fit1, nsim = 500)
+simulate(fit1, nsim = 300) %>% 
+  dharma_residuals(fit1)
 
 # ggeffects::ggpredict(fit1, "elevation[0:1500, by = 100]") |> plot()
 
@@ -119,7 +131,7 @@ for(year in unique(df$year)){
 }
 
 grid2[1:2,]
-p = predict(fit1, newdata = grid2, type = "response")
+p = predict(fit1, newdata = grid2, type = "response", return_tmb_object = TRUE)
 p = predict(fit2, newdata = grid2, type = "response")
 p = predict(fit3, newdata = grid2, type = "response")
 p = predict(fit4, newdata = grid2, type = "response")
@@ -137,6 +149,12 @@ summary(p_s$est2)
 p_s %>% p_sp_s %>% group_by(year) %>% summarize(mean = mean(est))
 
 hist(p_s$est, breaks = seq(0, 580, 5))
+
+# 
+ind_dg <- get_index(p, bias_correct = TRUE)
+visreg_delta(fit1, xvar = "elevation", model = 1, gg = TRUE, by = "year")
+visreg_delta(fit1, xvar = "elevation", model = 2, gg = TRUE, by = "year")
+
 
 # 予測値の不確実性の評価 -----------------------------------------------------------------
 p2_sim     <- predict(fit2, newdata = grid2, type="response", nsim=500)
