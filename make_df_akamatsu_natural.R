@@ -239,6 +239,9 @@ df_t4 = left_join(df_t4, check_tag4, by = "tag")
 df_t4 = df_t4 %>% filter(data2.y != -1)
 
 head(df_t1)
+head(df_t2)
+head(df_t3)
+head(df_t4)
 
 df_akamatsu = rbind(df_t1 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n),
                     df_t2 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n),
