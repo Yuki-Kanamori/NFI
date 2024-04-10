@@ -70,16 +70,6 @@ tidy(fit1, conf.int = TRUE)
 tidy(fit1, effects = "ran_pars", conf.int = TRUE)
 sanity(fit1)
 
-# residual
-qq1 <- residuals(fit1)
-qq1 <- qq1[is.finite(qq1)] # some Inf
-qqnorm(qq1);qqline(qq1)
-
-# simulation based residual
-s_qq <- simulate(fit1, nsim = 500)
-simulate(fit1, nsim = 300) %>% 
-  dharma_residuals(fit1)
-
 # ggeffects::ggpredict(fit1, "elevation[0:1500, by = 100]") |> plot()
 
 
@@ -159,14 +149,30 @@ p_s %>% p_sp_s %>% group_by(year) %>% summarize(mean = mean(est))
 
 hist(p_s$est, breaks = seq(0, 580, 5))
 
-# 
+
+
+# 説明変数の効果 -----------------------------------------------------------------
 ind_dg <- get_index(p, bias_correct = TRUE)
 visreg_delta(fit1, xvar = "elevation", model = 1, gg = TRUE, by = "year")
 visreg_delta(fit1, xvar = "elevation", model = 2, gg = TRUE, by = "year")
 
 
+
 # 予測値の不確実性の評価 -----------------------------------------------------------------
-p2_sim     <- predict(fit2, newdata = grid2, type="response", nsim=500)
+# qq plots
+# residual
+qq1 <- residuals(fit1)
+qq1 <- qq1[is.finite(qq1)] # some Inf
+qqnorm(qq1);qqline(qq1)
+
+# simulation based residual
+s_qq <- simulate(fit1, nsim = 500)
+simulate(fit1, nsim = 300) %>% 
+  dharma_residuals(fit1)
+
+
+# ??
+p2_sim     <- predict(fit1, newdata = grid2, type="response", nsim=500)
 p_s$est_sd<- apply(p2_sim, 1, sd)
 ggplot(p_s) + 
   geom_sf(aes(color = est_sd),pch=15,cex=0.5) +
@@ -186,4 +192,4 @@ index = get_index(p_st, bias_correct = T, area = rep(4, nrow(grid_yrs)))
 ggplot(index, aes(year, est)) +
   geom_ribbon(aes(ymin = lwr, ymax = upr), fill = "grey90") +
   geom_line(lwd = 1, colour = "grey30") +
-  labs(x = "Year", y = "Biomass (kg)")
+  labs(x = "Year", y = "CPUE (N/m^2)")
