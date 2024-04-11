@@ -17,7 +17,7 @@ for(i in 1999:2024){
   setwd("/Users/Yuki/Dropbox/LST/mean/")
   year = i
   
-  nc <- nc_open(paste0("area1/", year, "AMD_Area4_TMP_mea.nc.nc4"))
+  nc <- nc_open(paste0("area1/", year, "AMD_Area1_TMP_mea.nc.nc4"))
   print(nc)
   T <- ncvar_get(nc, "TMP_mea")
   dim(T) #[1] 560 800 365 lon, lat, time
@@ -62,7 +62,7 @@ for(i in 1999:2024){
   setwd("/Users/Yuki/Dropbox/LST/mean/")
   year = i
   
-  nc <- nc_open(paste0("area2/", year, "AMD_Area4_TMP_mea.nc.nc4"))
+  nc <- nc_open(paste0("area2/", year, "AMD_Area2_TMP_mea.nc.nc4"))
   print(nc)
   T <- ncvar_get(nc, "TMP_mea")
   dim(T) #[1] 560 800 365 lon, lat, time
@@ -107,7 +107,7 @@ for(i in 1999:2024){
   setwd("/Users/Yuki/Dropbox/LST/mean/")
   year = i
   
-  nc <- nc_open(paste0("area3/", year, "AMD_Area4_TMP_mea.nc.nc4"))
+  nc <- nc_open(paste0("area3/", year, "AMD_Area3_TMP_mea.nc.nc4"))
   print(nc)
   T <- ncvar_get(nc, "TMP_mea")
   dim(T) #[1] 560 800 365 lon, lat, time
@@ -199,7 +199,7 @@ for(i in 1999:2024){
   setwd("/Users/Yuki/Dropbox/LST/mean/")
   year = i
   
-  nc <- nc_open(paste0("area5/", year, "AMD_Area4_TMP_mea.nc.nc4"))
+  nc <- nc_open(paste0("area5/", year, "AMD_Area5_TMP_mea.nc.nc4"))
   print(nc)
   T <- ncvar_get(nc, "TMP_mea")
   dim(T) #[1] 560 800 365 lon, lat, time
@@ -245,7 +245,7 @@ for(i in 1999:2024){
   setwd("/Users/Yuki/Dropbox/LST/mean/")
   year = i
   
-  nc <- nc_open(paste0("area6/", year, "AMD_Area4_TMP_mea.nc.nc4"))
+  nc <- nc_open(paste0("area6/", year, "AMD_Area6_TMP_mea.nc.nc4"))
   print(nc)
   T <- ncvar_get(nc, "TMP_mea")
   dim(T) #[1] 560 800 365 lon, lat, time
