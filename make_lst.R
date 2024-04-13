@@ -255,3 +255,7 @@ for(i in 1999:2024){
 a6_2 = a6 %>% group_by(nendo, no) %>% summarize(mean = mean(mean))
 lst_a6 = a6_2
 save(lst_a6, file = "lst_a6.Rdata")
+
+
+lst_all = rbind(a1_2, a2_2, a3_2, a4_2, a5_2, a6_2) %>% group_by(nendo, no) %>% summarize(mean = mean(mean))
+save(lst_all, file = "lst_all.Rdata")
