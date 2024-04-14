@@ -248,10 +248,10 @@ ssd_a6 = a6_2
 save(ssd_a6, file = "ssd_a6.Rdata")
 
 
-lst_all = rbind(a1_2, a2_2, a3_2, a4_2, a5_2, a6_2) %>% group_by(nendo, no) %>% summarize(mean = mean(mean))
+ssd_all = rbind(a1_2, a2_2, a3_2, a4_2, a5_2, a6_2) %>% group_by(nendo, no) %>% summarize(mean = mean(mean_ssd))
 loc_sp = read.csv("/Users/Yuki/Dropbox/NFI/loc_sp.csv")
 head(loc_sp)
-lst_all = left_join(lst_all, loc_sp, by = "no")
-head(lst_all, 3)
-save(lst_all, file = "lst_all.Rdata")
-summary(lst_all)
+ssd_all = left_join(ssd_all, loc_sp, by = "no")
+head(ssd_all, 3)
+save(ssd_all, file = "ssd_all.Rdata")
+summary(ssd_all)
