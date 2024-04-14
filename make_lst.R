@@ -258,5 +258,8 @@ save(lst_a6, file = "lst_a6.Rdata")
 
 
 lst_all = rbind(a1_2, a2_2, a3_2, a4_2, a5_2, a6_2) %>% group_by(nendo, no) %>% summarize(mean = mean(mean))
+head(loc_sp)
+loc_sp = read.csv("/Users/Yuki/Dropbox/LST/mean/loc_sp.csv")
+lst_all = left_join(lst_all, loc_sp, by = "no")
 save(lst_all, file = "lst_all.Rdata")
 summary(lst_all)
