@@ -26,23 +26,29 @@ summary(df$obs)
 df = df %>% na.omit()
 
 
+# 気温データ
 load("/Users/Yuki/Dropbox/LST/mean/lst_all.Rdata")
 head(df, 3)
 head(lst_all, 3)
-lst_all = lst_all %>% select(nendo, tag, mean) %>% rename(year = nendo)
-lst_all2 = na.omit(lst_all)
+lst_all = lst_all %>% select(nendo, tag, mean)
+lst_all1 = lst_all %>% filter(between(nendo, 1999, 2003)) %>% mutate(year = 1) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+lst_all2 = lst_all %>% filter(between(nendo, 2004, 2008)) %>% mutate(year = 2) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+lst_all3 = lst_all %>% filter(between(nendo, 2009, 2013)) %>% mutate(year = 3) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+lst_all4 = lst_all %>% filter(between(nendo, 2014, 2018)) %>% mutate(year = 4) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+lst_all2 = rbind(lst_all1, lst_all2, lst_all3, lst_all4)
 df = left_join(df, lst_all2, by = c("tag", "year"))
-summary(df)
+summary(df) 
+df = df %>% na.omit()
 
-library(ggbeeswarm)
-ggplot(df %>% filter(obs > 0), aes(x = spp, y = obs))+
-  geom_violin(trim = FALSE)+
-  geom_beeswarm(aes(color = spp),
-                size = 2,
-                cex = 2,
-                alpha = .8)+
-  theme_classic() 
-hist(df$obs, breaks=seq(0, 180, 5))
+# library(ggbeeswarm)
+# ggplot(df %>% filter(obs > 0), aes(x = spp, y = obs))+
+#   geom_violin(trim = FALSE)+
+#   geom_beeswarm(aes(color = spp),
+#                 size = 2,
+#                 cex = 2,
+#                 alpha = .8)+
+#   theme_classic() 
+# hist(df$obs, breaks=seq(0, 180, 5))
 
 
 # データの地図 ------------------------------------------------------------------
@@ -64,10 +70,10 @@ plot(mesh, pch=1)
 
 # フィッティング -----------------------------------------------------------------
 fit1<- sdmTMB(
-  n ~ s(elevation) + as.factor(year),
+  cpue ~ s(mean) + as.factor(year),
   data = df,
   mesh = mesh,
-  family = poisson(),
+  family = delta_lognormal(),
   spatial = "on",
   anisotropy = TRUE,
   reml=FALSE)
@@ -128,11 +134,11 @@ AIC(fit4)
 
 # 予測 ----------------------------------------------------------------------
 df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
-grid = df2 %>% select(lonlat, lon, lat, elevation, slope) %>% distinct(lonlat, .keep_all = T)
+grid = df2 %>% select(lonlat, lon, lat, elevation, slope, mean) %>% distinct(lonlat, .keep_all = T)
 
 grid2 = NULL
 for(year in unique(df$year)){
-  grid_sub = data.frame(year, grid[, c("lon", "lat", "elevation", "slope")])
+  grid_sub = data.frame(year, grid[, c("lon", "lat", "elevation", "slope", "mean")])
   grid2 = rbind(grid2, grid_sub)
 }
 
@@ -143,7 +149,7 @@ p = predict(fit4, newdata = grid2, type = "response")
 p[1:3, ]
 p_s = st_as_sf(p, coords=c("lon", "lat"))
 summary(p_s)
-ggplot(p_s %>% filter(est > 1)) + 
+ggplot(p_s %>% filter(est2 > 0)) + 
   geom_sf(aes(color = est), pch=15,cex=0.5) +
   facet_wrap(~year) + 
   theme_minimal() +
@@ -154,6 +160,16 @@ summary(p_s$est)
 p_s %>% p_sp_s %>% group_by(year) %>% summarize(mean = mean(est))
 
 hist(p_s$est, breaks = seq(0, 580, 5))
+
+
+# 説明変数の効果 -----------------------------------------------------------------
+ind_dg <- get_index(p, bias_correct = TRUE)
+visreg_delta(fit1, xvar = "mean", model = 1, gg = TRUE, by = "year")
+visreg_delta(fit1, xvar = "mean", model = 2, gg = TRUE, by = "year")
+
+visreg_delta(fit1, xvar = "mean", model = 1, gg = TRUE)
+visreg_delta(fit1, xvar = "mean", model = 2, gg = TRUE)
+
 
 # 予測値の不確実性の評価 -----------------------------------------------------------------
 p2_sim     <- predict(fit2, newdata = grid2, type="response", nsim=500)
