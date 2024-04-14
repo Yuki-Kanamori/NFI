@@ -25,6 +25,15 @@ summary(df$obs)
 
 df = df %>% na.omit()
 
+
+load("/Users/Yuki/Dropbox/LST/mean/lst_all.Rdata")
+head(df, 3)
+head(lst_all, 3)
+lst_all = lst_all %>% select(nendo, tag, mean) %>% rename(year = nendo)
+lst_all2 = na.omit(lst_all)
+df = left_join(df, lst_all2, by = c("tag", "year"))
+summary(df)
+
 library(ggbeeswarm)
 ggplot(df %>% filter(obs > 0), aes(x = spp, y = obs))+
   geom_violin(trim = FALSE)+
