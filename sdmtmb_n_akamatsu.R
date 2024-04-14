@@ -38,6 +38,21 @@ df2 = df %>% mutate(pa = ifelse(cpue > 0, 1, 0))
 plot(x = df2$elevation, y = df2$pa)
 
 
+# 気温データ
+load("/Users/Yuki/Dropbox/LST/mean/lst_all.Rdata")
+head(df, 3)
+head(lst_all, 3)
+lst_all = lst_all %>% select(nendo, tag, mean)
+lst_all1 = lst_all %>% filter(between(nendo, 1999, 2003)) %>% mutate(year = 1) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+lst_all2 = lst_all %>% filter(between(nendo, 2004, 2008)) %>% mutate(year = 2) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+lst_all3 = lst_all %>% filter(between(nendo, 2009, 2013)) %>% mutate(year = 3) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+lst_all4 = lst_all %>% filter(between(nendo, 2014, 2018)) %>% mutate(year = 4) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+lst_all2 = rbind(lst_all1, lst_all2, lst_all3, lst_all4)
+df = left_join(df, lst_all2, by = c("tag", "year"))
+summary(df) 
+df = df %>% na.omit()
+
+
 # データの地図 ------------------------------------------------------------------
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
 ggplot(pcod_s %>% filter(obs > 0)) + 
@@ -57,7 +72,7 @@ plot(mesh, pch=1)
 
 # フィッティング -----------------------------------------------------------------
 fit1<- sdmTMB(
-  cpue ~ s(elevation) + as.factor(year),
+  cpue ~ s(mean) + as.factor(year),
   data = df,
   mesh = mesh,
   family = delta_lognormal(),
@@ -121,11 +136,11 @@ AIC(fit4)
 
 # 予測 ----------------------------------------------------------------------
 df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
-grid = df2 %>% select(lonlat, lon, lat, elevation, slope) %>% distinct(lonlat, .keep_all = T)
+grid = df2 %>% select(lonlat, lon, lat, elevation, slope, mean) %>% distinct(lonlat, .keep_all = T)
 
 grid2 = NULL
 for(year in unique(df$year)){
-  grid_sub = data.frame(year, grid[, c("lon", "lat", "elevation", "slope")])
+  grid_sub = data.frame(year, grid[, c("lon", "lat", "elevation", "slope", "mean")])
   grid2 = rbind(grid2, grid_sub)
 }
 
@@ -153,8 +168,8 @@ hist(p_s$est, breaks = seq(0, 580, 5))
 
 # 説明変数の効果 -----------------------------------------------------------------
 ind_dg <- get_index(p, bias_correct = TRUE)
-visreg_delta(fit1, xvar = "elevation", model = 1, gg = TRUE, by = "year")
-visreg_delta(fit1, xvar = "elevation", model = 2, gg = TRUE, by = "year")
+visreg_delta(fit1, xvar = "mean", model = 1, gg = TRUE, by = "year")
+visreg_delta(fit1, xvar = "mean", model = 2, gg = TRUE, by = "year")
 
 
 
