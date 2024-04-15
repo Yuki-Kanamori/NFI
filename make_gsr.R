@@ -253,7 +253,13 @@ setwd("/Users/Yuki/Dropbox/GSR/")
 save(gsr_a6, file = "gsr_a6.Rdata")
 
 
-gsr_all = rbind(a1_2, a2_2, a3_2, a4_2, a5_2, a6_2) %>% group_by(nendo, no) %>% summarize(mean = mean(mean_gsr))
+
+# 結合 ----------------------------------------------------------------------
+setwd("/Users/Yuki/Dropbox/GSR/")
+load("gsr_a1.Rdata"); load("gsr_a2.Rdata"); load("gsr_a3.Rdata")
+load("gsr_a4.Rdata"); load("gsr_a5.Rdata"); load("gsr_a6.Rdata")
+
+gsr_all = rbind(gsr_a1, gsr_a2, gsr_a3, gsr_a4, gsr_a5, gsr_a6) %>% group_by(nendo, no) %>% summarize(mean = mean(mean_gsr))
 loc_sp = read.csv("/Users/Yuki/Dropbox/NFI/loc_sp.csv")
 head(loc_sp)
 gsr_all = left_join(gsr_all, loc_sp, by = "no")
