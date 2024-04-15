@@ -67,6 +67,11 @@ df = left_join(df, gsr_all2, by = c("tag", "year"))
 summary(df) 
 df = df %>% na.omit()
 
+
+plot(x = df$elevation, y = df$cpue)
+plot(x = df$lst, y = df$cpue)
+plot(x = df$gsr, y = df$cpue)
+
 # データの地図 ------------------------------------------------------------------
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
 ggplot(pcod_s %>% filter(obs > 0)) + 
