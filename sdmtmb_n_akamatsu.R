@@ -16,6 +16,7 @@ require(visreg)
 load("df_akamatsu_natural.Rdata")
 df = df_akamatsu
 summary(df)
+unique(df$type)
 
 df = df %>% 
   # mutate(cpue = obs/effort) %>% 
