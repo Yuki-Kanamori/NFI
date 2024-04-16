@@ -119,10 +119,10 @@ sanity(fit1)
 
 
 fit2<- sdmTMB(
-  obs ~ s(elevation) + s(slope) + as.factor(year),
+  cpue ~ s(elevation) + s(bare) + s(gsr)  + fyear,
   data = df,
   mesh = mesh,
-  family = poisson(),
+  family = delta_lognormal(),
   spatial = "on",
   time = "year",
   spatiotemporal = "iid",
