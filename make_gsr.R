@@ -3,6 +3,7 @@ require(tidyverse)
 
 loc_lst = read.csv("/Users/Yuki/Dropbox/LST/mean/loc_sp.csv", fileEncoding = "CP932") 
 head(loc_lst, 3)
+length(unique(loc_lst$no))
 since = ymd("1900-01-01")
 
 # area1
@@ -203,8 +204,19 @@ for(i in 1999:2024){
   year_all2 = year_all %>% mutate(nendo = ifelse(month < 4, (as.numeric(i)-1), i))
   year_all3 = year_all2 %>% group_by(no, nendo) %>% summarize(mean = mean(gsr))
   
-  a5 = rbind(a3, year_all3)
+  a5 = rbind(a5, year_all3)
 }
+
+# check Kyushu
+head(a5, 3)
+a5 = left_join(a5, loc_lst, by = "no")
+pcod_s <- st_as_sf(a5, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = mean), pch=15,cex=0.5) +
+  # facet_wrap(~ year) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+
 
 a5_2 = a5 %>% group_by(nendo, no) %>% summarize(mean_gsr = mean(mean))
 gsr_a5 = a5_2
@@ -246,6 +258,17 @@ for(i in 1999:2024){
   
   a6 = rbind(a6, year_all3)
 }
+
+# # check Kyushu
+# head(a6, 3)
+# a6 = left_join(a6, loc_lst, by = "no")
+# pcod_s <- st_as_sf(a6, coords=c("lon", "lat"))
+# ggplot(pcod_s) + 
+#   geom_sf(aes(color = mean), pch=15,cex=0.5) +
+#   # facet_wrap(~ year) + 
+#   theme_minimal() +
+#   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+
 
 a6_2 = a6 %>% group_by(nendo, no) %>% summarize(mean_gsr = mean(mean))
 gsr_a6 = a6_2

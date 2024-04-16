@@ -209,7 +209,7 @@ for(i in 1999:2024){
   year_all2 = year_all %>% mutate(nendo = ifelse(month < 4, (as.numeric(i)-1), i))
   year_all3 = year_all2 %>% group_by(no, nendo) %>% summarize(mean = mean(lst))
   
-  a5 = rbind(a3, year_all3)
+  a5 = rbind(a5, year_all3)
 }
 
 a5_2 = a5 %>% group_by(nendo, no) %>% summarize(mean = mean(mean))
