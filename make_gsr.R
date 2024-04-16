@@ -139,7 +139,7 @@ for(i in 1999:2024){
   nc <- nc_open(paste0("area4/", year, "AMD_Area4_GSR.nc.nc4"))
   print(nc)
   T <- ncvar_get(nc, "GSR")
-  # dim(T) #[1] 560 800 365 lon, lat, time
+  # dim(T) #[1]  640 480 365 lon, lat, time
   
   time = data.frame(number = nc[["dim"]][["time"]][["vals"]]) %>% mutate(time = since + days(number))
   
@@ -181,7 +181,7 @@ for(i in 1999:2024){
   nc <- nc_open(paste0("area5/", year, "AMD_Area5_GSR.nc.nc4"))
   print(nc)
   T <- ncvar_get(nc, "GSR")
-  # dim(T) #[1] 560 800 365 lon, lat, time
+  # dim(T) #[1] 400 800 365 lon, lat, time
   
   time = data.frame(number = nc[["dim"]][["time"]][["vals"]]) %>% mutate(time = since + days(number))
   
@@ -194,6 +194,7 @@ for(i in 1999:2024){
     
     temp2 = temp %>% gather(key = lat, value = gsr, -lon) %>% mutate(time = paste(time[j, "time"])) %>% na.omit() %>%
       mutate(year = as.numeric(str_sub(time, 1, 4)), month = as.numeric(str_sub(time, 6, 7)), day = as.numeric(str_sub(time, 9, 10)), tag2 = paste(lon, lat, sep = "_"))
+    head(temp2, 3)
     
     loc = loc_lst
     temp3 = left_join(loc, temp2, by = "tag2")
@@ -213,7 +214,7 @@ a5 = left_join(a5, loc_lst, by = "no")
 pcod_s <- st_as_sf(a5, coords=c("lon", "lat"))
 ggplot(pcod_s) + 
   geom_sf(aes(color = mean), pch=15,cex=0.5) +
-  # facet_wrap(~ year) + 
+  facet_wrap(~ nendo) + 
   theme_minimal() +
   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
 
