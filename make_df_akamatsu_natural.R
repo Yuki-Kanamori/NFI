@@ -13,12 +13,21 @@ load("akamatsu_a_0.Rdata")
 
 head(df_a_0_akamatsu, 3)
 df_a = df_a_0_akamatsu %>% filter(species == "アカマツ", type == "天然林")
+unique(df_a$type)
 
 # n
 load("akamatsu_n_0.Rdata")
 
 head(df_n_0_akamatsu, 3)
 df_n = df_n_0_akamatsu %>% filter(species == "アカマツ", type == "天然林") %>% mutate(effort = 1000)
+unique(df_n$type)
+
+pcod_s <- st_as_sf(df_n, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = n), pch=15, cex=0.5) +
+  facet_wrap(~ year) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
 
 
 # 変化率 ---------------------------------------------------------------------
@@ -41,7 +50,7 @@ tag2_a = left_join(tag2_a, time3, by = "tag")
 tag2_a = left_join(tag2_a, time4, by = "tag")
 summary(tag2_a)
 
-tag3_a = tag2_a %>% mutate(check = rowSums(tag2_a[, 2:5], na.rm = T)) %>% filter(check != 0)
+tag3_a = tag2_a %>% mutate(check = rowSums(tag2_a[, 2:5])) %>% filter(check != 0)
 
 plot(x = tag3_a$time1, y = tag3_a$time2)
 plot(x = tag3_a$time2, y = tag3_a$time3)
@@ -72,7 +81,7 @@ tag2_n = left_join(tag2_n, time2, by = "tag")
 tag2_n = left_join(tag2_n, time3, by = "tag")
 tag2_n = left_join(tag2_n, time4, by = "tag")
 
-tag3_n = tag2_n %>% mutate(check = rowSums(tag2_n[, 2:5], na.rm = T)) %>% filter(check != 0)
+tag3_n = tag2_n %>% mutate(check = rowSums(tag2_n[, 2:5])) %>% filter(check != 0)
 
 plot(x = tag3_n$time1, y = tag3_n$time2)
 plot(x = tag3_n$time2, y = tag3_n$time3)
@@ -100,6 +109,8 @@ rate2 = rate %>% filter(check != -300) %>% mutate(time1to2_a = if_else(time1to2_
 df = rbind(df_a %>% rename(obs = sum_area) %>% mutate(area_n = "area"),
            df_n %>% rename(obs = n) %>% mutate(area_n = "n")) %>% mutate(tag = paste(lon, lat, sep = "_"))
 
+unique(df$type)
+
 df_t1 = df %>% filter(year == 1)
 df_t2 = df %>% filter(year == 2)
 df_t3 = df %>% filter(year == 3)
@@ -109,6 +120,7 @@ df_t4 = df %>% filter(year == 4)
 check1 = rate2 %>% filter(time1to2_n < 1) %>% filter(time1to2_a >= 2.5)
 check2 = rate2 %>% filter(time2to3_n < 1) %>% filter(time2to3_a >= 2.5)
 check3 = rate2 %>% filter(time3to4_n < 1) %>% filter(time3to4_a >= 2.5)
+Nneg_Apos = rbind(check1, check2, check3)
 
 # t = 1
 tag_t1 = df_t1 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
@@ -176,6 +188,7 @@ df_t4 = df_t4 %>% filter(data2 != -1)
 check1 = rate2 %>% filter(time1to2_n >= 1) %>% filter(time1to2_a < 0.8)
 check2 = rate2 %>% filter(time2to3_n >= 1) %>% filter(time2to3_a < 0.8)
 check3 = rate2 %>% filter(time3to4_n >= 1) %>% filter(time3to4_a < 0.8)
+Npos_Aneg = rbind(check1, check2, check3)
 
 # t = 1
 tag_t1 = df_t1 %>% select(tag) %>% distinct(tag) %>% mutate(data = 1)
@@ -185,6 +198,13 @@ check_tag1[is.na(check_tag1)] = 0
 
 df_t1 = left_join(df_t1, check_tag1, by = "tag")
 df_t1 = df_t1 %>% filter(data2.y != -1)
+pcod_s <- st_as_sf(df_t1, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = obs), pch=15, cex=0.5) +
+  facet_wrap(~ area_n, ncol = 2) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+
 
 
 # t = 2
@@ -205,6 +225,13 @@ check_tag2[is.na(check_tag2)] = 0
 
 df_t2 = left_join(df_t2, check_tag2, by = "tag")
 df_t2 = df_t2 %>% filter(data2.y.y != -1)
+pcod_s <- st_as_sf(df_t2, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = obs), pch=15, cex=0.5) +
+  facet_wrap(~ area_n, ncol = 2) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+
 
 
 # t = 3
@@ -226,6 +253,13 @@ check_tag3[is.na(check_tag3)] = 0
 
 df_t3 = left_join(df_t3, check_tag3, by = "tag")
 df_t3 = df_t3 %>% filter(data2.y.y != -1)
+pcod_s <- st_as_sf(df_t3, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = obs), pch=15, cex=0.5) +
+  facet_wrap(~ area_n, ncol = 2) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+
 
 
 # t = 4
@@ -237,14 +271,45 @@ check_tag4[is.na(check_tag4)] = 0
 
 df_t4 = left_join(df_t4, check_tag4, by = "tag")
 df_t4 = df_t4 %>% filter(data2.y != -1)
+pcod_s <- st_as_sf(df_t4, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = obs), pch=15, cex=0.5) +
+  facet_wrap(~ area_n, ncol = 2) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+
 
 head(df_t1)
 head(df_t2)
 head(df_t3)
 head(df_t4)
 
-df_akamatsu = rbind(df_t1 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n),
-                    df_t2 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n),
-                    df_t3 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n),
-                    df_t4 %>% mutate(cpue = obs/effort) %>% select(tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n))
+df_akamatsu = rbind(df_t1 %>% mutate(cpue = obs/effort*10) %>% select(type, tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n),
+                    df_t2 %>% mutate(cpue = obs/effort*10) %>% select(type, tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n),
+                    df_t3 %>% mutate(cpue = obs/effort*10) %>% select(type, tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n),
+                    df_t4 %>% mutate(cpue = obs/effort*10) %>% select(type, tag, lon, lat, year, obs, cpue, species, slope, elevation, area_n))
+unique(df_akamatsu$type)
+pcod_s <- st_as_sf(df_akamatsu, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = obs), pch=15, cex=0.5) +
+  facet_wrap(~ area_n, ncol = 2) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
 save(df_akamatsu, file = "df_akamatsu_natural.Rdata")
+
+
+
+# 除去されたデータについて ------------------------------------------------------------
+remove = rbind(Npos_Aneg, Nneg_Apos)
+head(df_n, 3); head(remove, 3)
+
+lonlat = df_n %>% select(tag, lon, lat) %>% distinct(tag, .keep_all = TRUE)
+remove = left_join(remove, lonlat, by = "tag")
+remove2 = remove %>% gather(key = time, value = rate, 2:7)
+
+pcod_s <- st_as_sf(remove2, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = rate), pch=15, cex=0.5) +
+  facet_wrap(~ time, ncol = 2) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
