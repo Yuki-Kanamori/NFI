@@ -100,7 +100,7 @@ pairs.panels(cor)
 
 # データの地図 ------------------------------------------------------------------
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
-ggplot(pcod_s %>% filter(cpue > 0)) + 
+ggplot(pcod_s) + 
   geom_sf(aes(color = obs), pch=15,cex=0.5) +
   facet_wrap(~ year) + 
   theme_minimal() +
