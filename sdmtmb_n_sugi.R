@@ -82,6 +82,11 @@ plot(x = df$lst, y = df$cpue)
 plot(x = df$gsr, y = df$cpue)
 plot(x = df$bare, y = df$cpue)
 
+cor = df %>% select(elevation, lst, gsr, apcp, bare)
+require(psych)
+pairs.panels(cor)
+
+
 # library(ggbeeswarm)
 # ggplot(df %>% filter(obs > 0), aes(x = spp, y = obs))+
 #   geom_violin(trim = FALSE)+
@@ -112,7 +117,7 @@ plot(mesh, pch=1)
 
 # フィッティング -----------------------------------------------------------------
 fit1<- sdmTMB(
-  cpue ~ s(elevation) + s(bare) + s(gsr) + s(apcp) + fyear,
+  cpue ~ s(elevation) + s(bare) + s(gsr)  + fyear,
   data = df,
   mesh = mesh,
   family = delta_lognormal(),
@@ -129,7 +134,7 @@ sanity(fit1)
 
 
 fit2<- sdmTMB(
-  cpue ~ s(elevation) + s(bare)  + fyear,
+  cpue ~ s(elevation) + s(bare) + s(gsr)  + fyear,
   data = df,
   mesh = mesh,
   family = delta_lognormal(),
@@ -146,7 +151,7 @@ sanity(fit2)
 
 
 fit3<- sdmTMB(
-  cpue ~ s(elevation) + s(bare) + fyear,
+  cpue ~ s(elevation) + s(bare) + s(gsr)  + fyear,
   data = df,
   mesh = mesh,
   family = delta_lognormal(),
@@ -159,7 +164,7 @@ sanity(fit3)
 
 
 fit4<- sdmTMB(
-  cpue ~ s(elevation) + s(bare) + fyear,
+  cpue ~ s(elevation) + s(bare) + s(gsr)  + fyear,
   data = df,
   mesh = mesh,
   family = delta_lognormal(),
