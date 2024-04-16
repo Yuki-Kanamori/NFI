@@ -212,6 +212,16 @@ for(i in 1999:2024){
   a5 = rbind(a5, year_all3)
 }
 
+# check Kyushu
+head(a5, 3)
+a5 = left_join(a5, loc_lst, by = "no")
+pcod_s <- st_as_sf(a5, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = mean), pch=15,cex=0.5) +
+  # facet_wrap(~ year) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+
 a5_2 = a5 %>% group_by(nendo, no) %>% summarize(mean = mean(mean))
 lst_a5 = a5_2
 save(lst_a5, file = "lst_a5.Rdata")
@@ -257,7 +267,12 @@ lst_a6 = a6_2
 save(lst_a6, file = "lst_a6.Rdata")
 
 
-lst_all = rbind(a1_2, a2_2, a3_2, a4_2, a5_2, a6_2) %>% group_by(nendo, no) %>% summarize(mean = mean(mean))
+# 結合 ----------------------------------------------------------------------
+setwd("/Users/Yuki/Dropbox/LST/mean/")
+load("lst_a1.Rdata"); load("lst_a2.Rdata"); load("lst_a3.Rdata")
+load("lst_a4.Rdata"); load("lst_a5.Rdata"); load("lst_a6.Rdata")
+
+lst_all = rbind(lst_a1, lst_a2, lst_a3, lst_a4, lst_a5, lst_a6) %>% group_by(nendo, no) %>% summarize(mean = mean(mean))
 loc_sp = read.csv("/Users/Yuki/Dropbox/LST/mean/loc_sp.csv")
 head(loc_sp)
 lst_all = left_join(lst_all, loc_sp, by = "no")
