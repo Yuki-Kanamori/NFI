@@ -44,7 +44,7 @@ a1_2 = a1 %>% group_by(nendo, no) %>% summarize(mean_apcp = mean(mean))
 apcp_a1 = a1_2
 summary(apcp_a1)
 setwd("/Users/Yuki/Dropbox/APCP/")
-save(gsr_a1, file = "apcp_a1.Rdata")
+save(apcp_a1, file = "apcp_a1.Rdata")
 
 
 # area2
@@ -206,6 +206,17 @@ for(i in 1999:2024){
   a5 = rbind(a5, year_all3)
 }
 
+# check Kyushu
+head(a5, 3)
+a5 = left_join(a5, loc_lst, by = "no")
+pcod_s <- st_as_sf(a5, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = mean), pch=15,cex=0.5) +
+  # facet_wrap(~ year) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+
+
 a5_2 = a5 %>% group_by(nendo, no) %>% summarize(mean_apcp = mean(mean))
 apcp_a5 = a5_2
 setwd("/Users/Yuki/Dropbox/APCP/")
@@ -253,7 +264,13 @@ setwd("/Users/Yuki/Dropbox/APCP/")
 save(apcp_a6, file = "apcp_a6.Rdata")
 
 
-apcp_all = rbind(a1_2, a2_2, a3_2, a4_2, a5_2, a6_2) %>% group_by(nendo, no) %>% summarize(mean = mean(mean_apcp))
+
+# 結合 ----------------------------------------------------------------------
+setwd("/Users/Yuki/Dropbox/APCP/")
+load("apcp_a1.Rdata"); load("apcp_a2.Rdata"); load("apcp_a3.Rdata")
+load("apcp_a4.Rdata"); load("apcp_a5.Rdata"); load("apcp_a6.Rdata")
+
+apcp_all = rbind(apcp_a1, apcp_a2, apcp_a3, apcp_a4, apcp_a5, apcp_a6) %>% group_by(nendo, no) %>% summarize(mean = mean(mean_apcp))
 loc_sp = read.csv("/Users/Yuki/Dropbox/NFI/loc_sp.csv")
 head(loc_sp)
 apcp_all = left_join(apcp_all, loc_sp, by = "no")
