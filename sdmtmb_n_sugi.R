@@ -47,11 +47,24 @@ head(df, 3)
 head(gsr_all, 3)
 gsr_all = gsr_all %>% select(nendo, tag, mean)
 gsr_all1 = gsr_all %>% filter(between(nendo, 1999, 2003)) %>% mutate(year = 1) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
-gsr_all2 = lst_all %>% filter(between(nendo, 2004, 2008)) %>% mutate(year = 2) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
-gsr_all3 = lst_all %>% filter(between(nendo, 2009, 2013)) %>% mutate(year = 3) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
-gsr_all4 = lst_all %>% filter(between(nendo, 2014, 2018)) %>% mutate(year = 4) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+gsr_all2 = gsr_all %>% filter(between(nendo, 2004, 2008)) %>% mutate(year = 2) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+gsr_all3 = gsr_all %>% filter(between(nendo, 2009, 2013)) %>% mutate(year = 3) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+gsr_all4 = gsr_all %>% filter(between(nendo, 2014, 2018)) %>% mutate(year = 4) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
 gsr_all2 = rbind(gsr_all1, gsr_all2, gsr_all3, gsr_all4) %>% rename(gsr = mean)
 df = left_join(df, gsr_all2, by = c("tag", "year"))
+summary(df) 
+
+# 降水量
+load("/Users/Yuki/Dropbox/APCP/apcp_all.Rdata")
+head(df, 3)
+head(apcp_all, 3)
+apcp_all = apcp_all %>% select(nendo, tag, mean)
+apcp_all1 = apcp_all %>% filter(between(nendo, 1999, 2003)) %>% mutate(year = 1) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+apcp_all2 = apcp_all %>% filter(between(nendo, 2004, 2008)) %>% mutate(year = 2) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+apcp_all3 = apcp_all %>% filter(between(nendo, 2009, 2013)) %>% mutate(year = 3) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+apcp_all4 = apcp_all %>% filter(between(nendo, 2014, 2018)) %>% mutate(year = 4) %>% group_by(tag, year) %>% summarize(mean = mean(mean))
+apcp_all2 = rbind(apcp_all1, apcp_all2, apcp_all3, apcp_all4) %>% rename(apcp = mean)
+df = left_join(df, apcp_all2, by = c("tag", "year"))
 summary(df) 
 df = df %>% na.omit()
 
@@ -82,7 +95,7 @@ plot(x = df$bare, y = df$cpue)
 
 # データの地図 ------------------------------------------------------------------
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
-ggplot(pcod_s %>% filter(obs > 0)) + 
+ggplot(pcod_s %>% filter(cpue > 0)) + 
   geom_sf(aes(color = obs), pch=15,cex=0.5) +
   facet_wrap(~ year) + 
   theme_minimal() +
@@ -99,7 +112,7 @@ plot(mesh, pch=1)
 
 # フィッティング -----------------------------------------------------------------
 fit1<- sdmTMB(
-  cpue ~ s(elevation) + bare + fyear,
+  cpue ~ s(elevation) + s(bare) + s(gsr) + s(apcp) + fyear,
   data = df,
   mesh = mesh,
   family = delta_lognormal(),
@@ -116,10 +129,10 @@ sanity(fit1)
 
 
 fit2<- sdmTMB(
-  obs ~ s(elevation) + s(slope) + as.factor(year),
+  cpue ~ s(elevation) + s(bare)  + fyear,
   data = df,
   mesh = mesh,
-  family = poisson(),
+  family = delta_lognormal(),
   spatial = "on",
   time = "year",
   spatiotemporal = "iid",
@@ -133,28 +146,29 @@ sanity(fit2)
 
 
 fit3<- sdmTMB(
-  obs ~ s(elevation) + s(slope) + as.factor(year),
+  cpue ~ s(elevation) + s(bare) + fyear,
   data = df,
   mesh = mesh,
-  family = poisson(),
+  family = delta_lognormal(),
   spatial = "on",
   time = "year",
   spatiotemporal = "AR1",
   anisotropy = TRUE,
   reml=FALSE)
+sanity(fit3)
 
 
 fit4<- sdmTMB(
-  obs ~ s(elevation) + s(slope) + as.factor(year),
+  cpue ~ s(elevation) + s(bare) + fyear,
   data = df,
   mesh = mesh,
-  family = poisson(),
+  family = delta_lognormal(),
   spatial = "on",
   time = "year",
   spatiotemporal = "RW",
   anisotropy = TRUE,
   reml=FALSE)
-
+sanity(fit4)
 
 AIC(fit1)
 AIC(fit2)
@@ -162,8 +176,9 @@ AIC(fit3)
 AIC(fit4)
 
 # 予測 ----------------------------------------------------------------------
-df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
-grid = df2 %>% select(lonlat, lon, lat, elevation, slope, lst, gsr, bare) %>% distinct(lonlat, .keep_all = T)
+head(df, 3)
+# df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
+grid = df %>% select(tag, lon, lat, elevation, bare) %>% distinct(tag, .keep_all = T)
 
 grid2 = NULL
 for(year in unique(df$fyear)){
@@ -172,24 +187,26 @@ for(year in unique(df$fyear)){
 }
 
 grid2[1:2,]
-p = predict(fit1, newdata = grid2, type = "response", return_tmb_object = TRUE)
+p = predict(fit4, newdata = grid2, type = "response", return_tmb_object = TRUE)
+p_map = predict(fit4, newdata = grid2, type = "response")
 p = predict(fit2, newdata = grid2, type = "response")
 p = predict(fit3, newdata = grid2, type = "response")
 p = predict(fit4, newdata = grid2, type = "response")
-p[1:3, ]
-p_s = st_as_sf(p, coords=c("lon", "lat"))
+p_map[1:3, ]
+p_s = st_as_sf(p_map, coords=c("lon", "lat"))
 summary(p_s)
-ggplot(p_s %>% filter(est2 > 0)) + 
+ggplot(p_s %>% filter(est > 0)) + 
   geom_sf(aes(color = est), pch=15,cex=0.5) +
-  facet_wrap(~year) + 
+  facet_wrap(~fyear) + 
   theme_minimal() +
   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
   # scale_color_gradient(low = "lightgrey", high = "red")
 summary(p_s$est)
+summary(df$cpue)
 
 p_s %>% p_sp_s %>% group_by(year) %>% summarize(mean = mean(est))
 
-hist(p_s$est, breaks = seq(0, 580, 5))
+hist(p_s$est, breaks = seq(0, 5000, 5))
 
 
 # 説明変数の効果 -----------------------------------------------------------------
@@ -197,8 +214,8 @@ ind_dg <- get_index(p, bias_correct = TRUE)
 visreg_delta(fit1, xvar = "elevation", model = 1, gg = TRUE, by = "fyear")
 visreg_delta(fit1, xvar = "bare", model = 2, gg = TRUE, by = "fyear")
 
-visreg_delta(fit1, xvar = "elevation", model = 1, gg = TRUE)
-visreg_delta(fit1, xvar = "bare", model = 2, gg = TRUE)
+visreg_delta(fit2, xvar = "elevation", model = 1, gg = TRUE)
+visreg_delta(fit2, xvar = "bare", model = 2, gg = TRUE)
 
 
 # 予測値の不確実性の評価 -----------------------------------------------------------------
