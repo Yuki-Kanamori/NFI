@@ -161,10 +161,20 @@ fit1<- sdmTMB(
   anisotropy = TRUE,
   reml=FALSE)
 
+fit1_2<- sdmTMB(
+  obs ~ s(elevation) + s(bare) + s(gsr)  + fyear,
+  data = df,
+  mesh = mesh,
+  family = poisson(),
+  spatial = "on",
+  anisotropy = TRUE,
+  reml=FALSE)
+
 fit1
 tidy(fit1, conf.int = TRUE)
 tidy(fit1, effects = "ran_pars", conf.int = TRUE)
 sanity(fit1)
+sanity(fit1_2)
 
 # ggeffects::ggpredict(fit1, "elevation[0:1500, by = 100]") |> plot()
 
@@ -180,11 +190,22 @@ fit2<- sdmTMB(
   anisotropy = TRUE,
   reml=FALSE)
 
+fit2_2<- sdmTMB(
+  obs ~ s(elevation) + s(bare) + s(gsr)  + fyear,
+  data = df,
+  mesh = mesh,
+  family = poisson(),
+  spatial = "on",
+  time = "year",
+  spatiotemporal = "iid",
+  anisotropy = TRUE,
+  reml = FALSE)
+
 fit2
 tidy(fit2, conf.int = TRUE)
 tidy(fit2, effects = "ran_pars", conf.int = TRUE)
 sanity(fit2)
-
+sanity(fit2_2)
 
 fit3<- sdmTMB(
   cpue ~ s(elevation) + s(bare) + s(gsr)  + fyear,
@@ -226,10 +247,13 @@ for(year in unique(df$fyear)){
   grid_sub = data.frame(fyear = year, grid[, c("lon", "lat", "elevation", "slope", "lst", "gsr", "bare")])
   grid2 = rbind(grid2, grid_sub)
 }
+summary(grid2)
+summary(df)
+
 
 grid2[1:2,]
-p = predict(fit1, newdata = grid2, type = "response", return_tmb_object = TRUE)
-p_map = predict(fit1, newdata = grid2, type = "response")
+p = predict(fit1_2, newdata = grid2, type = "response", return_tmb_object = TRUE)
+p_map = predict(fit1_2, newdata = grid2, type = "response")
 p = predict(fit2, newdata = grid2, type = "response")
 p = predict(fit3, newdata = grid2, type = "response")
 p = predict(fit4, newdata = grid2, type = "response")
@@ -260,13 +284,17 @@ visreg_delta(fit1, xvar = "elevation", model = 2, gg = TRUE)
 visreg_delta(fit1, xvar = "gsr", model = 2, gg = TRUE)
 visreg_delta(fit1, xvar = "bare", model = 2, gg = TRUE)
 
+visreg(fit1_2, xvar = "elevation", gg = TRUE)
+visreg(fit1_2, xvar = "gsr", gg = TRUE)
+visreg(fit1_2, xvar = "bare", gg = TRUE)
+
 
 # 予測値の不確実性の評価 -----------------------------------------------------------------
-p2_sim     <- predict(fit2, newdata = grid2, type="response", nsim=500)
+p2_sim     <- predict(fit1_2, newdata = grid2, type="response", nsim=500)
 p_s$est_sd<- apply(p2_sim, 1, sd)
 ggplot(p_s) + 
   geom_sf(aes(color = est_sd),pch=15,cex=0.5) +
-  facet_wrap(~year) + 
+  facet_wrap(~fyear) + 
   theme_minimal() +
   scale_color_gradient(low = "lightgrey", high = "red")
 
