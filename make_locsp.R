@@ -11,19 +11,19 @@ setwd(dir = dirname)
 load("akamatsu_n_0.Rdata") # 変なデータを抜く前のデータ．こっちの方が地点の情報が多いから
 df = df_n_0_akamatsu
 head(df, 3)
-unique(df$type)
-loc_sp = df %>% mutate(tag = paste(lon, lat, sep ="_")) %>% select(lon, lat, tag) %>% distinct(tag, .keep_all = T)
+unique(df$type) # 変なデータを抜く前．データ全部と考えて良い．
+loc_sp = df %>% mutate(tag = paste(lon, lat, sep ="_")) %>% select(lon, lat, tag) %>% distinct(tag, .keep_all = TRUE)
 # write.csv(loc_sp, "loc_sp.csv", fileEncoding = "CP932", row.names = F)
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
 ggplot(pcod_s) + 
-  geom_sf(aes(color = obs), pch=15,cex=0.5) +
-  facet_wrap(~ area_n) + 
+  geom_sf(aes(color = n), pch=15,cex=0.5) +
+  facet_wrap(~ year) + 
   theme_minimal() +
   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
 
 
 
-loc_sp2 = read.csv("/Users/Yuki/Dropbox/LST/mean/loc_sp.csv")
+loc_sp2 = read.csv("/Users/Yuki/Dropbox/LST/mean/loc_sp.csv") # akamatsu_n_0.Rdataに含まれている位置情報と同じ数だけデータがある
 summary(loc_sp2)
 
 
