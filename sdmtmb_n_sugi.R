@@ -23,7 +23,7 @@ df = df %>%
 summary(df)
 summary(df$obs)
 
-df = df %>% na.omit()
+# df = df %>% na.omit()
 
 
 # 気温データ
@@ -39,6 +39,12 @@ lst_all2 = rbind(lst_all1, lst_all2, lst_all3, lst_all4) %>% rename(lst = mean)
 df = left_join(df, lst_all2, by = c("tag", "year"))
 summary(df) 
 # df = df %>% na.omit()
+pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = obs), pch=15,cex=0.5) +
+  facet_wrap(~ year) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
 
 
 # 日射量
@@ -53,6 +59,12 @@ gsr_all4 = gsr_all %>% filter(between(nendo, 2014, 2018)) %>% mutate(year = 4) %
 gsr_all2 = rbind(gsr_all1, gsr_all2, gsr_all3, gsr_all4) %>% rename(gsr = mean)
 df = left_join(df, gsr_all2, by = c("tag", "year"))
 summary(df) 
+pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = obs), pch=15,cex=0.5) +
+  facet_wrap(~ year) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
 
 # 降水量
 load("/Users/Yuki/Dropbox/APCP/apcp_all.Rdata")
@@ -66,7 +78,16 @@ apcp_all4 = apcp_all %>% filter(between(nendo, 2014, 2018)) %>% mutate(year = 4)
 apcp_all2 = rbind(apcp_all1, apcp_all2, apcp_all3, apcp_all4) %>% rename(apcp = mean)
 df = left_join(df, apcp_all2, by = c("tag", "year"))
 summary(df) 
-df = df %>% na.omit()
+# df = df %>% na.omit()
+pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = obs), pch=15,cex=0.5) +
+  facet_wrap(~ year) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+
+
+
 
 # 裸地データ
 load("/Users/Yuki/Dropbox/NFI/bare.Rdata")
@@ -74,7 +95,22 @@ head(df, 3); head(bare, 3)
 bare_nat = bare %>% filter(type == "天然林") %>% select(tag, bare, year)
 df = left_join(df, bare_nat, by = c("tag", "year"))
 summary(df)
-df = df %>% na.omit() %>% mutate(fyear = as.factor(year))
+df = df %>% mutate(fyear = as.factor(year))
+pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = obs), pch=15,cex=0.5) +
+  facet_wrap(~ year) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+
+df = df %>% na.omit() %>% filter(elevation > 0)
+pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
+ggplot(pcod_s) + 
+  geom_sf(aes(color = obs), pch=15,cex=0.5) +
+  facet_wrap(~ year) + 
+  theme_minimal() +
+  scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+
 
 
 plot(x = df$elevation, y = df$cpue)
@@ -182,16 +218,14 @@ AIC(fit4)
 
 # 予測 ----------------------------------------------------------------------
 head(df, 3)
-# df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
-# grid = df %>% select(tag, lon, lat, elevation, bare) %>% distinct(tag, .keep_all = T)
-# 
-# grid2 = NULL
-# for(year in unique(df$fyear)){
-#   grid_sub = data.frame(fyear = year, grid[, c("lon", "lat", "elevation", "slope", "lst", "gsr", "bare")])
-#   grid2 = rbind(grid2, grid_sub)
-# }
+df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
+grid = df %>% select(tag, lon, lat, elevation, slope, lst, gsr, bare) %>% distinct(tag, .keep_all = TRUE)
 
-grid2 = df %>% select(fyear, lon, lat, elevation, bare, gsr)
+grid2 = NULL
+for(year in unique(df$fyear)){
+  grid_sub = data.frame(fyear = year, grid[, c("lon", "lat", "elevation", "slope", "lst", "gsr", "bare")])
+  grid2 = rbind(grid2, grid_sub)
+}
 
 grid2[1:2,]
 p = predict(fit1, newdata = grid2, type = "response", return_tmb_object = TRUE)
@@ -211,7 +245,7 @@ ggplot(p_s %>% filter(est > 0)) +
 summary(p_s$est)
 summary(df$cpue)
 
-p_s %>% p_sp_s %>% group_by(year) %>% summarize(mean = mean(est))
+p_s %>% group_by(fyear) %>% summarize(mean = mean(est))
 
 hist(p_s$est, breaks = seq(0, 5000, 5))
 
@@ -221,8 +255,10 @@ ind_dg <- get_index(p, bias_correct = TRUE)
 visreg_delta(fit1, xvar = "elevation", model = 1, gg = TRUE, by = "fyear")
 visreg_delta(fit1, xvar = "bare", model = 2, gg = TRUE, by = "fyear")
 
-visreg_delta(fit1, xvar = c("elevation", "bare", "gsr"), model = 1, gg = TRUE)
-visreg_delta(fit1, xvar = c("elevation", "bare", "gsr"), model = 2, gg = TRUE)
+visreg_delta(fit1, xvar = "elevation", model = 1, gg = TRUE)
+visreg_delta(fit1, xvar = "elevation", model = 2, gg = TRUE)
+visreg_delta(fit1, xvar = "gsr", model = 2, gg = TRUE)
+visreg_delta(fit1, xvar = "bare", model = 2, gg = TRUE)
 
 
 # 予測値の不確実性の評価 -----------------------------------------------------------------

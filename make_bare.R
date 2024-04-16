@@ -245,11 +245,12 @@ all = rbind(time1 %>% select(-no_id) %>% mutate(time = 1), time2 %>% select(-no_
 # 胸高断面積データに0データを入れる -------------------------------------------------------------
 # time1
 head(time1, 3)
-time1 = time1 %>% mutate(area = (DBH/2/100)^2*3.14)
+time1 = time1 %>% mutate(area = (DBH/2/100)^2*3.14) #半径×半径×3.14．cmなのでmに直す
 time1_a = time1 %>% group_by(type, site_id, species) %>% summarize(sum_area = sum(area))
 time1_a = left_join(time1_a, site1, by = "site_id") %>% mutate(year = 1, tag = paste(lon, lat, sep = "_"))
+summary(time1_a)
 
-sum_a1 = time1_a %>% group_by(tag, type) %>% summarize(total_area = sum(sum_area)) %>% mutate(bare = 100-total_area, year = 1)
+sum_a1 = time1_a %>% group_by(tag, type) %>% summarize(total_area = sum(sum_area)) %>% mutate(bare = 1000-total_area, year = 1)
 
 
 
@@ -258,7 +259,7 @@ time2 = time2 %>% mutate(area = (DBH/2/100)^2*3.14)
 time2_a = time2 %>% group_by(type, site_id, species) %>% summarize(sum_area = sum(area))
 time2_a = left_join(time2_a, site2, by = "site_id") %>% mutate(year = 2, tag = paste(lon, lat, sep = "_"))
 
-sum_a2 = time2_a %>% group_by(tag, type) %>% summarize(total_area = sum(sum_area)) %>% mutate(bare = 100-total_area, year = 2)
+sum_a2 = time2_a %>% group_by(tag, type) %>% summarize(total_area = sum(sum_area)) %>% mutate(bare = 1000-total_area, year = 2)
 
 
 
@@ -268,7 +269,7 @@ time3_a = time3 %>% group_by(type, site_id, species) %>% summarize(sum_area = su
 time3_a = left_join(time3_a, site3 %>% select(-type), by = "site_id") %>% mutate(year = 3, tag = paste(lon, lat, sep = "_"))
 head(time3_a)
 
-sum_a3 = time3_a %>% group_by(tag, type) %>% summarize(total_area = sum(sum_area)) %>% mutate(bare = 100-total_area, year = 3)
+sum_a3 = time3_a %>% group_by(tag, type) %>% summarize(total_area = sum(sum_area)) %>% mutate(bare = 1000-total_area, year = 3)
 
 
 
@@ -277,7 +278,7 @@ time4 = time4 %>% mutate(area = (DBH/2/100)^2*3.14)
 time4_a = time4 %>% group_by(type, site_id, species) %>% summarize(sum_area = sum(area))
 time4_a = left_join(time4_a, site4 %>% select(-type), by = "site_id") %>% mutate(year = 3, tag = paste(lon, lat, sep = "_"))
 
-sum_a4 = time4_a %>% group_by(tag, type) %>% summarize(total_area = sum(sum_area)) %>% mutate(bare = 100-total_area, year = 4)
+sum_a4 = time4_a %>% group_by(tag, type) %>% summarize(total_area = sum(sum_area)) %>% mutate(bare = 1000-total_area, year = 4)
 
 
 bare = rbind(sum_a1, sum_a2, sum_a3, sum_a4)
