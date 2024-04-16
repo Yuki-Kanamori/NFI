@@ -183,17 +183,19 @@ AIC(fit4)
 # 予測 ----------------------------------------------------------------------
 head(df, 3)
 # df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
-grid = df %>% select(tag, lon, lat, elevation, bare) %>% distinct(tag, .keep_all = T)
+# grid = df %>% select(tag, lon, lat, elevation, bare) %>% distinct(tag, .keep_all = T)
+# 
+# grid2 = NULL
+# for(year in unique(df$fyear)){
+#   grid_sub = data.frame(fyear = year, grid[, c("lon", "lat", "elevation", "slope", "lst", "gsr", "bare")])
+#   grid2 = rbind(grid2, grid_sub)
+# }
 
-grid2 = NULL
-for(year in unique(df$fyear)){
-  grid_sub = data.frame(fyear = year, grid[, c("lon", "lat", "elevation", "slope", "lst", "gsr", "bare")])
-  grid2 = rbind(grid2, grid_sub)
-}
+grid2 = df %>% select(fyear, lon, lat, elevation, bare, gsr)
 
 grid2[1:2,]
-p = predict(fit4, newdata = grid2, type = "response", return_tmb_object = TRUE)
-p_map = predict(fit4, newdata = grid2, type = "response")
+p = predict(fit1, newdata = grid2, type = "response", return_tmb_object = TRUE)
+p_map = predict(fit1, newdata = grid2, type = "response")
 p = predict(fit2, newdata = grid2, type = "response")
 p = predict(fit3, newdata = grid2, type = "response")
 p = predict(fit4, newdata = grid2, type = "response")
@@ -219,8 +221,8 @@ ind_dg <- get_index(p, bias_correct = TRUE)
 visreg_delta(fit1, xvar = "elevation", model = 1, gg = TRUE, by = "fyear")
 visreg_delta(fit1, xvar = "bare", model = 2, gg = TRUE, by = "fyear")
 
-visreg_delta(fit2, xvar = "elevation", model = 1, gg = TRUE)
-visreg_delta(fit2, xvar = "bare", model = 2, gg = TRUE)
+visreg_delta(fit1, xvar = c("elevation", "bare", "gsr"), model = 1, gg = TRUE)
+visreg_delta(fit1, xvar = c("elevation", "bare", "gsr"), model = 2, gg = TRUE)
 
 
 # 予測値の不確実性の評価 -----------------------------------------------------------------
