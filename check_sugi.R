@@ -10,7 +10,6 @@ setwd(dir = dirname)
 
 # load data ---------------------------------------------------------------
 load("sugi_a_0.Rdata")
-df = df_a_0_sugi
 summary(df)
 unique(df$type)
 df = df %>% 
