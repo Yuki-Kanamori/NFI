@@ -67,10 +67,20 @@ df = left_join(df, gsr_all2, by = c("tag", "year"))
 summary(df) 
 df = df %>% na.omit()
 
+# 裸地データ
+load("/Users/Yuki/Dropbox/NFI/bare.Rdata")
+head(df, 3); head(bare, 3)
+bare_nat = bare %>% filter(type == "天然林") %>% select(tag, bare, year)
+df = left_join(df, bare_nat, by = c("tag", "year"))
+summary(df)
+df = df %>% na.omit() %>% mutate(fyear = as.factor(year))
+
 
 plot(x = df$elevation, y = df$cpue)
 plot(x = df$lst, y = df$cpue)
 plot(x = df$gsr, y = df$cpue)
+plot(x = df$bare, y = df$cpue)
+
 
 # データの地図 ------------------------------------------------------------------
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
@@ -91,7 +101,7 @@ plot(mesh, pch=1)
 
 # フィッティング -----------------------------------------------------------------
 fit1<- sdmTMB(
-  cpue ~ s(gsr) + as.factor(year),
+  cpue ~ s(gsr) + s(bare) + fyear,
   data = df,
   mesh = mesh,
   family = delta_lognormal(),
@@ -155,11 +165,12 @@ AIC(fit4)
 
 # 予測 ----------------------------------------------------------------------
 df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
-grid = df2 %>% select(lonlat, lon, lat, elevation, slope, lst, gsr) %>% distinct(lonlat, .keep_all = T)
+grid = df2 %>% select(lonlat, lon, lat, elevation, slope, lst, gsr, bare) 
+grid = grid %>% distinct(lonlat, .keep_all = T)
 
 grid2 = NULL
-for(year in unique(df$year)){
-  grid_sub = data.frame(year, grid[, c("lon", "lat", "elevation", "slope", "lst", "gsr")])
+for(year in unique(df$fyear)){
+  grid_sub = data.frame(fyear = year, grid[, c("lon", "lat", "elevation", "slope", "lst", "gsr", "bare")])
   grid2 = rbind(grid2, grid_sub)
 }
 
@@ -187,9 +198,9 @@ hist(p_s$est, breaks = seq(0, 580, 5))
 
 # 説明変数の効果 -----------------------------------------------------------------
 ind_dg <- get_index(p, bias_correct = TRUE)
-visreg_delta(fit1, xvar = "gsr", model = 1, gg = TRUE, by = "year")
-visreg_delta(fit1, xvar = "gsr", model = 2, gg = TRUE, by = "year")
-
+visreg_delta(fit1, xvar = "gsr", model = 1, gg = TRUE, by = "fyear")
+visreg_delta(fit1, xvar = "bare", model = 2, gg = TRUE, by = "fyear")
+visreg_delta(fit1, xvar = "bare", model = 2, gg = TRUE)
 
 
 # 予測値の不確実性の評価 -----------------------------------------------------------------
