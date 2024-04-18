@@ -153,7 +153,7 @@ plot(mesh, pch=1)
 
 # フィッティング -----------------------------------------------------------------
 fit1<- sdmTMB(
-  cpue ~ s(elevation) + s(bare) + s(gsr)  + fyear,
+  cpue ~ s(elevation) + s(bare) + elevation:bare + s(gsr)  + fyear,
   data = df,
   mesh = mesh,
   family = delta_lognormal(),
@@ -180,7 +180,7 @@ sanity(fit1_2)
 
 
 fit2<- sdmTMB(
-  cpue ~ s(elevation) + s(bare) + s(gsr)  + fyear,
+  cpue ~ s(elevation) + s(bare)  + year,
   data = df,
   mesh = mesh,
   family = delta_lognormal(),
@@ -190,22 +190,10 @@ fit2<- sdmTMB(
   anisotropy = TRUE,
   reml=FALSE)
 
-fit2_2<- sdmTMB(
-  obs ~ s(elevation) + s(bare) + s(gsr)  + fyear,
-  data = df,
-  mesh = mesh,
-  family = poisson(),
-  spatial = "on",
-  time = "year",
-  spatiotemporal = "iid",
-  anisotropy = TRUE,
-  reml = FALSE)
-
 fit2
 tidy(fit2, conf.int = TRUE)
 tidy(fit2, effects = "ran_pars", conf.int = TRUE)
 sanity(fit2)
-sanity(fit2_2)
 
 fit3<- sdmTMB(
   cpue ~ s(elevation) + s(bare) + s(gsr)  + fyear,
@@ -244,7 +232,7 @@ grid = df %>% select(tag, lon, lat, elevation, slope, lst, gsr, bare) %>% distin
 
 grid2 = NULL
 for(year in unique(df$fyear)){
-  grid_sub = data.frame(fyear = year, grid[, c("lon", "lat", "elevation", "slope", "lst", "gsr", "bare")])
+  grid_sub = data.frame(year = year, grid[, c("lon", "lat", "elevation", "slope", "lst", "gsr", "bare")])
   grid2 = rbind(grid2, grid_sub)
 }
 summary(grid2)
@@ -252,8 +240,8 @@ summary(df)
 
 
 grid2[1:2,]
-p = predict(fit1_2, newdata = grid2, type = "response", return_tmb_object = TRUE)
-p_map = predict(fit1_2, newdata = grid2, type = "response")
+p = predict(fit2, newdata = grid2, type = "response", return_tmb_object = TRUE)
+p_map = predict(fit2, newdata = grid2, type = "response")
 p = predict(fit2, newdata = grid2, type = "response")
 p = predict(fit3, newdata = grid2, type = "response")
 p = predict(fit4, newdata = grid2, type = "response")
