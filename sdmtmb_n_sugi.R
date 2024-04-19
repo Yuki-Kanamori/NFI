@@ -270,6 +270,9 @@ visreg_delta(fit1, xvar = "elevation", model = 1, gg = TRUE, by = "fyear")
 visreg_delta(fit1, xvar = "bare", model = 2, gg = TRUE, by = "fyear")
 
 visreg_delta(fit1, xvar = "elevation", model = 1, gg = TRUE)
+visreg_delta(fit1, xvar = "gsr", model = 1, gg = TRUE)
+visreg_delta(fit1, xvar = "bare", model = 1, gg = TRUE)
+
 visreg_delta(fit1, xvar = "elevation", model = 2, gg = TRUE)
 visreg_delta(fit1, xvar = "gsr", model = 2, gg = TRUE)
 visreg_delta(fit1, xvar = "bare", model = 2, gg = TRUE)
