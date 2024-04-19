@@ -11,8 +11,8 @@ library(sp)
 # read the data
 # df = read.csv("sugi_n.csv", fileEncoding = "CP932")
 # load("sugi_n_0.Rdata")
-load("df_hinoki_natural.Rdata")
-df = df_hinoki
+load("df_akamatsu_natural.Rdata")
+df = df_akamatsu
 summary(df)
 
 df = df %>% 
@@ -107,7 +107,7 @@ df = df %>% na.omit() %>% filter(elevation > 0) %>% mutate(cpue = obs/1000) %>% 
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
 ggplot(pcod_s) + 
   geom_sf(aes(color = obs), pch=15,cex=0.5) +
-  facet_wrap(~ year, ncol = 4) + 
+  facet_wrap(~ year) + 
   theme_minimal() +
   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
 
@@ -183,6 +183,7 @@ fit4<- sdmTMB(
 sanity(fit4)
 
 AIC(fit2);AIC(fit3);AIC(fit4)
+
 
 
 
