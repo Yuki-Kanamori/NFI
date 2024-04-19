@@ -153,10 +153,11 @@ plot(mesh, pch=1)
 
 # フィッティング -----------------------------------------------------------------
 fit1<- sdmTMB(
-  cpue ~ s(elevation) + s(bare) + elevation:bare + s(gsr)  + fyear,
+  cpue ~ s(elevation) + s(bare) + s(gsr)  + fyear,
   data = df,
   mesh = mesh,
   family = delta_lognormal(),
+  time = "fyear",
   spatial = "on",
   anisotropy = TRUE,
   reml=FALSE)
@@ -226,22 +227,23 @@ AIC(fit3)
 AIC(fit4)
 
 # 予測 ----------------------------------------------------------------------
-head(df, 3)
-df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
-grid = df %>% select(tag, lon, lat, elevation, slope, lst, gsr, bare) %>% distinct(tag, .keep_all = TRUE)
+# head(df, 3)
+# df2 = df %>% mutate(lonlat = paste(lon, lat, sep = "_"))
+# grid = df %>% select(tag, lon, lat, elevation, slope, lst, gsr, bare) %>% distinct(tag, .keep_all = TRUE)
+# 
+# grid2 = NULL
+# for(year in unique(df$fyear)){
+#   grid_sub = data.frame(year = year, grid[, c("lon", "lat", "elevation", "slope", "lst", "gsr", "bare")])
+#   grid2 = rbind(grid2, grid_sub)
+# }
+# summary(grid2)
+# summary(df)
 
-grid2 = NULL
-for(year in unique(df$fyear)){
-  grid_sub = data.frame(year = year, grid[, c("lon", "lat", "elevation", "slope", "lst", "gsr", "bare")])
-  grid2 = rbind(grid2, grid_sub)
-}
-summary(grid2)
-summary(df)
-
+grid2 = df %>% select(lon, lat, elevation, gsr, bare, fyear)
 
 grid2[1:2,]
-p = predict(fit2, newdata = grid2, type = "response", return_tmb_object = TRUE)
-p_map = predict(fit2, newdata = grid2, type = "response")
+p = predict(fit1, newdata = grid2, type = "response", return_tmb_object = TRUE)
+p_map = predict(fit1, newdata = grid2, type = "response")
 p = predict(fit2, newdata = grid2, type = "response")
 p = predict(fit3, newdata = grid2, type = "response")
 p = predict(fit4, newdata = grid2, type = "response")
