@@ -186,6 +186,7 @@ AIC(fit2);AIC(fit3);AIC(fit4)
 
 
 
+# 予測 ----------------------------------------------------------------------
 p = predict(fit2, type = "response", return_tmb_object = TRUE)
 p_map = p$data
 
