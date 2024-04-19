@@ -11,8 +11,8 @@ library(sp)
 # read the data
 # df = read.csv("sugi_n.csv", fileEncoding = "CP932")
 # load("sugi_n_0.Rdata")
-load("df_hinoki_natural.Rdata")
-df = df_hinoki
+load("df_konara_natural.Rdata")
+df = df_konara
 summary(df)
 
 df = df %>% 
@@ -103,7 +103,7 @@ ggplot(pcod_s) +
   theme_minimal() +
   scale_colour_gradientn(colours = c("black", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
 
-df = df %>% na.omit() %>% filter(elevation > 0) %>% mutate(pa = ifelse(cpue > 0, 1, 0))
+df = df %>% na.omit() %>% filter(elevation > 0) %>% mutate(cpue = obs/1000) %>% mutate(pa = ifelse(cpue > 0, 1, 0))
 pcod_s <- st_as_sf(df, coords=c("lon", "lat"))
 ggplot(pcod_s) + 
   geom_sf(aes(color = obs), pch=15,cex=0.5) +
@@ -183,6 +183,7 @@ fit4<- sdmTMB(
 sanity(fit4)
 
 AIC(fit2);AIC(fit3);AIC(fit4)
+
 
 
 
