@@ -12,7 +12,7 @@ library(sp)
 # df = read.csv("sugi_n.csv", fileEncoding = "CP932")
 # load("sugi_n_0.Rdata")
 load("df_sugi_natural.Rdata")
-df = df_sugi
+df = df_sugi %>% mutate(cpue = obs/1000)
 summary(df)
 
 df = df %>% 
@@ -187,7 +187,7 @@ AIC(fit2);AIC(fit3);AIC(fit4)
 
 
 # 予測 ----------------------------------------------------------------------
-p = predict(fit3, type = "response", return_tmb_object = TRUE)
+p = predict(fit2, type = "response", return_tmb_object = TRUE)
 p_map = p$data
 
 p_map[1:3, ]
