@@ -216,7 +216,7 @@ visreg_delta(fit2, xvar = "bare", model = 2, gg = TRUE)
 
 
 # 残差 ----------------------------------------------------------------------
-p_map$resids <- residuals(fit3)
+p_map$resids <- residuals(fit2)
 hist(p_map$resids)
 
 qqnorm(p_map$resids);abline(a = 0, b = 1)
