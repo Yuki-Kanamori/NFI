@@ -142,7 +142,7 @@ plot(mesh, pch=1)
 # フィッティング -----------------------------------------------------------------
 fit2<- sdmTMB(
   # formula = list(pa ~ s(elevation) + as.factor(year), cpue ~ s(bare) + s(gsr) + as.factor(year)),
-  cpue ~ s(elevation) + s(bare) + s(gsr)  + as.factor(year),
+  cpue ~ s(elevation) + s(apcp) + s(gsr)  + as.factor(year),
   data = df,
   mesh = mesh,
   family = delta_lognormal(),
@@ -212,7 +212,7 @@ visreg_delta(fit2, xvar = "bare", model = 1, gg = TRUE)
 visreg_delta(fit2, xvar = "elevation", model = 2, gg = TRUE)
 visreg_delta(fit2, xvar = "gsr", model = 2, gg = TRUE)
 visreg_delta(fit2, xvar = "bare", model = 2, gg = TRUE)
-
+visreg_delta(fit2, xvar = "apcp", model = 2, gg = TRUE)
 
 
 # 残差 ----------------------------------------------------------------------
