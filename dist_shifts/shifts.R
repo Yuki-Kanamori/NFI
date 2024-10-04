@@ -1,4 +1,8 @@
 require(tidyverse)
+require(ggplot2)
+require(maps)
+require(mapdata)
+require(mapproj)
 
 
 # directory ---------------------------------------------------------------
@@ -130,3 +134,25 @@ inc_ele = df_lm2 %>% filter(param == "time", Pr...t.. <= 0.05, Estimate > 0)
 nrow(inc_ele)/length(unique(df_lm2$species))*100
 
 check_ele = df_lm2 %>% filter(param == "time", Pr...t.. <= 0.05)
+
+
+
+# 調査地点（天然林，森林） --------------------------------------------------------------------
+tone = pre_cog %>% filter(species == "オオイタヤメイゲツ")
+summary(tone$dens)
+head(tone)
+
+# 日本地図の設定（変更しない）
+japan = map_data("japan") %>% mutate(long = long - 0.01, lat = lat - 0.01)
+
+g = ggplot() + 
+  geom_polygon(data = japan, aes(x = long, y = lat, group = group), colour = "black", fill = "white") + 
+  coord_map(xlim = c(128, 132), ylim = c(27, 35))
+
+p = geom_point(data = tone, aes(x = lon, y = lat, color = dens), shape = 15, size = 1)
+c = scale_color_gradientn(colours = c("blue", "cyan", "green", "yellow", "orange", "red", "darkred"))
+# c = scale_fill_gradientn(colours = c("white", "blue", "red"))
+f = facet_wrap(~ time, ncol = 4)
+labs = labs(title = "", x = "", y = "", color = "Density")
+
+g+p+c+f+labs+theme_bw()
