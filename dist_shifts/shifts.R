@@ -77,7 +77,8 @@ df_all2 = left_join(df_all, df_pref, by = c("site_id", "time")) %>% filter(usage
 unique(df_all2$pref)
 
 
-# 重心の変化 -------------------------------------------------------
+
+# 東北のデータを抽出 ---------------------------------------------------------------
 tohoku = c("青森", "岩手", "秋田", "宮城", "福島", "山形")
 tohoku = c("長崎県", "鹿児島県", "佐賀県", "熊本県", "宮崎県", "大分県", "福岡県")
 
@@ -86,6 +87,30 @@ unique(df_tohoku$pref)
 
 pre_cog = df_tohoku %>% group_by(time, site_id, lon, lat, species) %>% summarize(count = sum(n)) %>% mutate(effort_ha = 0.1) %>% mutate(dens = count/effort_ha)
 
+
+
+# 各種の出現パターンから優占種などを確認する -------------------------------------------------------------------
+# 調査期間全体で密度が多い種
+options(scipen=10)
+dominant = pre_cog %>% group_by(species) %>% summarize(mean_dens = mean(dens)) %>% filter(mean_dens > 0) %>% arrange(-mean_dens)
+head(dominant$species)
+
+# 各調査期間での密度
+dominant2 = pre_cog %>% group_by(species, time) %>% summarize(mean_dens = mean(dens)) %>% filter(mean_dens > 0) %>% arrange(-mean_dens)
+
+# 各調査期間での空間的出現頻度
+pre_cog2 = pre_cog %>% mutate(pa = ifelse(dens > 0, 1, 0)) %>% group_by(species, time) %>% summarize(sum = sum(pa))
+n_survey = pre_cog %>% distinct(site_id, time) %>% group_by(time) %>% count()
+pre_cog2 = left_join(pre_cog2, n_survey, by = "time") %>% mutate(s_freq = sum/n) %>% filter(s_freq > 0) %>% arrange(-s_freq)
+
+# 調査期間全体での空間的出現頻度
+pre_cog2 = pre_cog %>% mutate(pa = ifelse(dens > 0, 1, 0)) %>% group_by(species) %>% summarize(sum = sum(pa))
+n_survey = pre_cog %>% distinct(site_id)
+pre_cog2 = pre_cog2 %>% mutate(n = nrow(n_survey)) %>% mutate(s_freq = sum/n) %>% filter(s_freq > 0) %>% arrange(-s_freq)
+
+
+
+# 重心の変化 -------------------------------------------------------
 # 緯度方向
 haha_lat = pre_cog %>% group_by(time, species) %>% summarize(haha = sum(dens))
 ko_lat = pre_cog %>% mutate(ko = dens*lat) %>% group_by(time, species) %>% summarize(ko = sum(ko))
