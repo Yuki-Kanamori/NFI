@@ -83,9 +83,9 @@ unique(df_tohoku$pref)
 pre_cog = df_tohoku %>% group_by(time, site_id, lon, lat, species) %>% summarize(count = sum(n)) %>% mutate(effort_ha = 0.1) %>% mutate(dens = count/effort_ha)
 
 # 緯度方向
-haha_lat = pre_cog %>% group_by(time) %>% summarize(haha = sum(dens))
+haha_lat = pre_cog %>% group_by(time, species) %>% summarize(haha = sum(dens))
 ko_lat = pre_cog %>% mutate(ko = dens*lat) %>% group_by(time, species) %>% summarize(ko = sum(ko))
-cog_lat = left_join(ko_lat, haha_lat, by = "time") %>% mutate(cog = ko/haha)
+cog_lat = left_join(ko_lat, haha_lat, by = c("time", "species")) %>% mutate(cog = ko/haha)
 
 length(unique(ko_lat$species))
 
@@ -93,8 +93,10 @@ sp = unique(ko_lat$species)
 df_lm = NULL
 for(i in 1:1313){
   df = cog_lat %>% ungroup() %>% filter(species == sp[[i]])
-  if(sum(df$cog) == 0) next
-  lm = summary(lm(cog ~ time, data = df))
+  df2 = df %>% na.omit()
+  
+  if(nrow(df2) <= 1) next
+  lm = summary(lm(cog ~ time, data = df2))
   lm2 = lm[["coefficients"]] %>% data.frame() %>% mutate(species = sp[[i]], param = c("intercept", "time"))
   
   df_lm = rbind(df_lm, lm2)
@@ -102,3 +104,29 @@ for(i in 1:1313){
 
 inc_lat = df_lm %>% filter(param == "time", Pr...t.. <= 0.05, Estimate > 0)
 
+
+# 高度方向
+haha_ele = pre_cog %>% group_by(time, species) %>% summarize(haha = sum(dens))
+ele = df_pref %>% filter(usage == "森林") %>% group_by(site_id) %>% 
+  select(site_id, elevation) %>% na.omit() %>% summarize(mean_ele = mean(elevation))
+ko_ele = left_join(pre_cog, ele, by = c("site_id"))  %>% mutate(ko = dens*mean_ele) %>% group_by(time, species) %>% summarize(ko = sum(ko))
+cog_ele = left_join(ko_ele, haha_ele, by = c("time", "species")) %>% mutate(cog = ko/haha)
+
+sp2 = unique(ko_ele$species)
+
+df_lm2 = NULL
+for(i in 1:1313){
+  df = cog_ele %>% ungroup() %>% filter(species == sp2[[i]])
+  df2 = df %>% na.omit()
+  
+  if(nrow(df2) <= 1) next
+  lm = summary(lm(cog ~ time, data = df2))
+  lm2 = lm[["coefficients"]] %>% data.frame() %>% mutate(species = sp2[[i]], param = c("intercept", "time"))
+  
+  df_lm2 = rbind(df_lm2, lm2)
+}
+
+inc_ele = df_lm2 %>% filter(param == "time", Pr...t.. <= 0.05, Estimate > 0)
+nrow(inc_ele)/length(unique(df_lm2$species))*100
+
+check_ele = df_lm2 %>% filter(param == "time", Pr...t.. <= 0.05)
