@@ -289,3 +289,5 @@ for(i in 1:nrow(lonlat)){
 
 length(unique(df_all$species))
 length(unique(df_all$site_id))
+
+save(file = df_all, "df_allN.Rdata")
