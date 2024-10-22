@@ -78,6 +78,28 @@ unique(df_all2$pref)
 
 
 
+# 北海道 ---------------------------------------------------------------------
+df_hokk = df_all2 %>% filter(pref == "北海道")
+setwd(dir = dir)
+save(df_hokk, file = "hokkaido_N.Rdata")
+
+
+
+# 東北6県 --------------------------------------------------------------------
+tohoku = c("青森県", "岩手県", "秋田県", "宮城県", "福島県", "山形県")
+df_tohoku = df_all2 %>% filter(pref %in% tohoku)
+unique(df_tohoku$pref)
+save(df_tohoku, file = "tohoku_N.Rdata")
+
+
+
+# 関東 ----------------------------------------------------------------------
+tohoku = c("青森県", "岩手県", "秋田県", "宮城県", "福島県", "山形県")
+df_tohoku = df_all2 %>% filter(pref %in% tohoku)
+unique(df_tohoku$pref)
+save(df_tohoku, file = "tohoku_N.Rdata")
+
+
 # 東北のデータを抽出 ---------------------------------------------------------------
 tohoku = c("青森", "岩手", "秋田", "宮城", "福島", "山形")
 tohoku = c("長崎県", "鹿児島県", "佐賀県", "熊本県", "宮崎県", "大分県", "福岡県")
