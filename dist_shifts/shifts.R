@@ -74,6 +74,7 @@ nrow(pref1)+nrow(pref2)+nrow(pref3)+nrow(pref4)
 # head(df_pref)
 # df_pref2 = df_pref %>% filter(usage == "森林") %>% select("site_id", "pref") %>% distinct(site_id, .keep_all = TRUE)
 # save(df_pref2, file = "df_pref.Rdata")
+# write.csv(df_pref2, "df_pref.csv", row.names = FALSE)
 
 
 # 樹木データに都道府県と土地利用情報を付与する --------------------------------------------------
