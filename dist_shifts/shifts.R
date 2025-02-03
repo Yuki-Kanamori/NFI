@@ -70,6 +70,10 @@ pref4$time = 4
 df_pref = rbind(pref1, pref2, pref3, pref4) %>% distinct(site_id, time, .keep_all = TRUE)
 nrow(pref1)+nrow(pref2)+nrow(pref3)+nrow(pref4)
 
+# setwd(dir = dir)
+# head(df_pref)
+# df_pref2 = df_pref %>% filter(usage == "森林") %>% select("site_id", "pref") %>% distinct(site_id, .keep_all = TRUE)
+# save(df_pref2, file = "df_pref.Rdata")
 
 
 # 樹木データに都道府県と土地利用情報を付与する --------------------------------------------------
