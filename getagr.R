@@ -24,11 +24,11 @@ area_daily_lst =
     output = "tibble"
   )
 
-area_daily_rain <-
-  fetch_amgsds(
-    times = ymd(c("2023-01-10", "2023-01-11"), tz = "Japan"),
-    lats = c(41.5, 43.8), lons = c(140.2, 142.0),
-    elements = "APCP",
-    mode = "area",
-    output = "array"
-  )
+# area_daily_rain <-
+#   fetch_amgsds(
+#     times = ymd(c("2023-01-10", "2023-01-11"), tz = "Japan"),
+#     lats = c(41.5, 43.8), lons = c(140.2, 142.0),
+#     elements = "APCP",
+#     mode = "area",
+#     output = "array"
+#   )
